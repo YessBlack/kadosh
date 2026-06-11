@@ -12,5 +12,11 @@
   },
   "plugins": [
     "@typescript-eslint"
+  ],
+  "ignorePatterns": [
+    "jest.config.js",
+    "jest.config.ts",
+    "vite.config.ts",
+    "tailwind.config.js"
   ]
 }

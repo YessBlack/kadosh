@@ -19,7 +19,6 @@ export class AuthModel {
         }
       }
     } catch (error) {
-      console.log(error)
       throw new Error('Login failed')
     }
   }

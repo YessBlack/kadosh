@@ -1,15 +1,16 @@
-import express from 'express'
-import helmet from 'helmet'
+import 'dotenv/config'
+import { AppDependencies } from '@/types/dependencies/dependencies.type'
+import { AuthModel } from './models/user/auth.model'
+import { createApp } from './app'
 
-const app = express()
-const PORT = process.env.PORT || 1234
+const PORT = process.env.PORT ?? 3001
 
-app.use(helmet())
+const dependencies: AppDependencies = {
+  authModel: new AuthModel()
+}
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok' })
-})
+const app = createApp(dependencies)
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`)
+  console.log(`Server running on http://localhost:${PORT}`)
 })

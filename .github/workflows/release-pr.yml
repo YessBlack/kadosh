@@ -1,0 +1,74 @@
+name: Release PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (example: 0.1.0)"
+        required: true
+        type: string
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-release-pr:
+    name: Open Release PR Develop To Main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate version format
+        shell: bash
+        run: |
+          if ! echo "${{ inputs.version }}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'; then
+            echo "Invalid version format: ${{ inputs.version }}" >&2
+            exit 1
+          fi
+
+      - name: Create Release PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = '${{ inputs.version }}';
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const existing = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              head: `${owner}:develop`,
+              base: 'main',
+            });
+
+            if (existing.data.length > 0) {
+              core.info(`Release PR alredy exists: ${existing.data[0].html_url}`);
+              return;
+            }
+
+            const body = [
+              '## Description',
+              '',
+              `Release v${version} from develop into main.`,
+              '',
+              '## Changes Included',
+              '',
+              '- Includes all changes already merged into develop.',
+              '- Triggers release tagging workflow when merged into main.',
+              '',
+              '## Checklist',
+              '',
+              '- [ ] CI checks are green',
+              '- [ ] Release notes reviewed',
+              '- [ ] Ready to merge into main'
+            ].join('\n')
+
+            const pr = await github.rest.pulls.create({
+              owner,
+              repo,
+              title: `release: v${version}`,
+              head: 'develop',
+              base: 'main',
+              body
+            })
+
+            core.info(`Created PR: ${pr.data.html_url}`)

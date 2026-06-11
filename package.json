@@ -1,0 +1,22 @@
+{
+  "name": "kadosh",
+  "version": "1.0.0",
+  "description": "POS e inventario para pequeños negocios",
+  "private": true,
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "10.0.3",
+    "eslint-config-standard": "^17.1.0",
+    "standard": "17.1.2"
+  },
+  "dependencies": {
+    "express": "5.2.1"
+  },
+  "eslintConfig": {
+    "extends": "standard"
+  }
+}

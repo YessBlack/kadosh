@@ -17,11 +17,16 @@ export class AuthController {
     const result = validateLogin(req.body)
 
     if (!result.success) {
-      return res.status(400).json({ error: result.error.issues })
+      res.status(400).json({ error: result.error.issues })
+      return
     }
 
-    const response = await this.authModel.login(result.data)
-    res.status(200).json(response)
+    try {
+      const response = await this.authModel.login(result.data)
+      res.status(200).json(response)
+    } catch (error) {
+      res.status(401).json({ message: 'Invalid credentials' })
+    }
   }
 
   logout = async (req: Request, res: Response) => {

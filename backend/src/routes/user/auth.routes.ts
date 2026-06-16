@@ -12,6 +12,7 @@ export const createAuthRouter = ({ authModel }: AuthRouterDeps) => {
 
   authRouter.post('/login', authController.login)
   authRouter.post('/logout', authController.logout)
+  authRouter.get('/me', authController.me)
 
   return authRouter
 }

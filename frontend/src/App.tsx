@@ -1,7 +1,11 @@
+import { RouterProvider } from 'react-router-dom'
+import { router } from '@/router/router'
+
 export const App = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <h1 className="text-4xl font-bold text-gray-800">Welcome to Kadosh!</h1>
-    </div>
+    <>
+      <div className='fixed right-4 top-4 z-50'></div>
+      <RouterProvider router={router} />
+    </>
   )
 }

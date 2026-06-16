@@ -17,5 +17,5 @@ export type AuthResponse = {
 export interface IAuthModel {
   login: ({ email, password }: LoginInput) => Promise<AuthResponse>
   logout: () => Promise<void>
-  me: () => Promise<void>
+  me: (token: string) => Promise<AuthResponse>
 }

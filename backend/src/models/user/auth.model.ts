@@ -1,4 +1,5 @@
 import { AuthResponse, LoginInput } from '@/types/user/auth.type'
+import { isPocketBaseError } from '@/utils/pocketbase.error'
 import PocketBase from 'pocketbase'
 
 const pb = new PocketBase(process.env.POCKETBASE_URL)
@@ -18,8 +19,11 @@ export class AuthModel {
           name: result.record.name
         }
       }
-    } catch (error) {
-      throw new Error('Login failed')
+    } catch (error: unknown) {
+      if (isPocketBaseError(error) && error.status === 400) {
+        throw new Error('Invalid credentials')
+      }
+      throw new Error('Server error')
     }
   }
 
@@ -27,7 +31,25 @@ export class AuthModel {
     pb.authStore.clear()
   }
 
-  async me (): Promise<void> {
-    // TODO: implement when use cookies for auth token
+  async me (token: string): Promise<AuthResponse> {
+    try {
+      pb.authStore.save(token, null)
+
+      const result = await pb.collection('users').authRefresh()
+
+      return {
+        token: result.token,
+        user: {
+          id: result.record.id,
+          email: result.record.email,
+          name: result.record.name
+        }
+      }
+    } catch (error: unknown) {
+      if (isPocketBaseError(error) && error.status === 401) {
+        throw new Error('Invalid session')
+      }
+      throw new Error('Server error')
+    }
   }
 }

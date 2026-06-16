@@ -23,19 +23,54 @@ export class AuthController {
 
     try {
       const response = await this.authModel.login(result.data)
-      res.status(200).json(response)
-    } catch (error) {
-      res.status(401).json({ message: 'Invalid credentials' })
+
+      res.cookie('token', response.token, {
+        httpOnly: true,
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      })
+
+      res.status(200).json({ user: response.user })
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message === 'Invalid credentials') {
+        res.status(401).json({ message: 'Invalid credentials' })
+        return
+      }
+
+      res.status(500).json({ message: 'Server error' })
     }
   }
 
   logout = async (req: Request, res: Response) => {
-    await this.authModel.logout()
-    res.status(200).json({ message: 'Logout successful' })
+    const token = req.cookies.token
+
+    if (token) await this.authModel.logout()
+
+    res.clearCookie('token', {
+      httpOnly: true,
+      sameSite: 'strict'
+    })
+
+    res.status(200).json({ message: 'Logged out successfully' })
   }
 
   me = async (req: Request, res: Response) => {
-    await this.authModel.me()
-    res.status(200).json({ message: 'User info' })
+    const token = req.cookies.token
+
+    if (!token) {
+      res.status(401).json({ message: 'Unauthorized' })
+      return
+    }
+
+    try {
+      const user = await this.authModel.me(token)
+      res.status(200).json({ user })
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message === 'Invalid session') {
+        res.status(401).json({ message: 'Unauthorized' })
+        return
+      }
+      res.status(500).json({ message: 'Server error' })
+    }
   }
 }

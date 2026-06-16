@@ -4,7 +4,7 @@ import { lazy } from 'react'
 import { GuestGuard } from '@/guards/GuestGuard'
 import { AuthLayout } from '@/layouts/AuthLayout'
 
-const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
+const LoginPage = lazy(() => import('@/features/auth/pages/LoginPage'))
 
 export const authRoutes: RouteObject[] = [
   {

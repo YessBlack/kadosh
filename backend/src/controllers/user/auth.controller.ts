@@ -33,4 +33,9 @@ export class AuthController {
     await this.authModel.logout()
     res.status(200).json({ message: 'Logout successful' })
   }
+
+  me = async (req: Request, res: Response) => {
+    await this.authModel.me()
+    res.status(200).json({ message: 'User info' })
+  }
 }

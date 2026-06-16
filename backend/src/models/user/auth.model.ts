@@ -26,4 +26,8 @@ export class AuthModel {
   async logout (): Promise<void> {
     pb.authStore.clear()
   }
+
+  async me (): Promise<void> {
+    // TODO: implement when use cookies for auth token
+  }
 }

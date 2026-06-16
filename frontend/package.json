@@ -12,12 +12,14 @@
     "test:run": "echo 'No tests yet'"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.3.0",
+    "@tailwindcss/vite": "4.3.0",
     "axios": "1.17.0",
+    "pocketbase": "0.27.0",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "react-router-dom": "7.17.0",
-    "tailwindcss": "^4.3.0"
+    "tailwindcss": "4.3.0",
+    "zustand": "5.0.14"
   },
   "devDependencies": {
     "@babel/core": "7.29.0",
@@ -30,8 +32,8 @@
     "@vitejs/plugin-react": "6.0.1",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "10.3.0",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.2",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-react-refresh": "0.5.2",
     "globals": "17.6.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "8.59.2",

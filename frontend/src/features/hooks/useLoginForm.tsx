@@ -13,6 +13,10 @@ export const useLoginForm = () => {
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const isFormFilled = () => {
+    return values.email.trim() !== '' && values.password.trim() !== ''
+  }
+
   const validate = (): boolean => {
     const newErrors: FormErrors = {}
 
@@ -20,7 +24,10 @@ export const useLoginForm = () => {
       newErrors.email = 'El email es requerido'
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+    if (
+      !newErrors.email &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)
+    ) {
       newErrors.email = 'Debe ser un email válido'
     }
 
@@ -28,7 +35,7 @@ export const useLoginForm = () => {
       newErrors.password = 'La contraseña es requerida'
     }
 
-    if (values.password.length < 8) {
+    if (values.password && values.password.length < 8) {
       newErrors.password = 'Mínimo 8 caracteres'
     }
 
@@ -56,5 +63,5 @@ export const useLoginForm = () => {
     }
   }
 
-  return { values, errors, isSubmitting, handleChange, handleSubmit }
+  return { values, errors, isSubmitting, handleChange, handleSubmit, isFormFilled }
 }

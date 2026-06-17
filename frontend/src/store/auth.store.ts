@@ -5,39 +5,30 @@ import { create } from 'zustand'
 interface AuthStore {
   user: User | null
   isAuthenticated: boolean
-  isLoading: boolean
+  isInitializing: boolean
   initialize: () => Promise<void>
-  login: (loginData: LoginData) => Promise<void>
-  logout: () => void
+  login: (data: LoginData) => Promise<void>
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
   isAuthenticated: false,
-  isLoading: true,
+  isInitializing: true,
 
   initialize: async () => {
-    set({ isLoading: true })
+    set({ isInitializing: true })
 
     try {
       const user = await authApi.me()
-      set({ user, isAuthenticated: true, isLoading: false })
+      set({ user, isAuthenticated: true, isInitializing: false })
     } catch {
-      set({ user: null, isAuthenticated: false, isLoading: false })
+      set({ user: null, isAuthenticated: false, isInitializing: false })
     }
   },
 
   login: async (credentials: LoginData) => {
-    set({ isLoading: true })
-
-    try {
-      const user = await authApi.login(credentials)
-      set({ user, isAuthenticated: true, isLoading: false })
-    } catch (error: unknown) {
-      console.error('Login error:', error)
-      set({ isLoading: false, user: null, isAuthenticated: false })
-      throw error
-    }
+    const user = await authApi.login(credentials)
+    set({ user, isAuthenticated: true })
   },
 
   logout: async () => {

@@ -6,7 +6,6 @@ interface AuthStore {
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean
-  error: string | null
   initialize: () => Promise<void>
   login: (loginData: LoginData) => Promise<void>
   logout: () => void
@@ -16,7 +15,6 @@ export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
   isAuthenticated: false,
   isLoading: true,
-  error: null,
 
   initialize: async () => {
     set({ isLoading: true })
@@ -30,13 +28,15 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   login: async (credentials: LoginData) => {
-    set({ isLoading: true, error: null })
+    set({ isLoading: true })
 
     try {
       const user = await authApi.login(credentials)
-      set({ user, isLoading: false })
-    } catch {
-      set({ error: 'Credenciales inválidas', isLoading: false })
+      set({ user, isAuthenticated: true, isLoading: false })
+    } catch (error: unknown) {
+      console.error('Login error:', error)
+      set({ isLoading: false, user: null, isAuthenticated: false })
+      throw error
     }
   },
 
@@ -48,8 +48,12 @@ export const useAuthStore = create<AuthStore>((set) => ({
         isAuthenticated: false,
         user: null
       })
-    } catch {
-      set({ error: 'Error al cerrar sesión' })
+    } catch (error: unknown) {
+      set({
+        isAuthenticated: false,
+        user: null
+      })
+      throw error
     }
   }
 }))

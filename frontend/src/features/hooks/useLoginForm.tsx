@@ -63,5 +63,5 @@ export const useLoginForm = () => {
     }
   }
 
-  return { values, errors, isSubmitting, handleChange, handleSubmit, isFormFilled }
+  return { values, errors, isSubmitting, handleChange, handleSubmit, isFormFilled, setValues }
 }

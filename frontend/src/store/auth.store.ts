@@ -8,6 +8,7 @@ interface AuthStore {
   isInitializing: boolean
   initialize: () => Promise<void>
   login: (data: LoginData) => Promise<void>
+  logout: () => Promise<void>
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({

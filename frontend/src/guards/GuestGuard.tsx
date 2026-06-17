@@ -2,9 +2,9 @@ import { useAuthStore } from '@/store/auth.store'
 import { Navigate, Outlet } from 'react-router-dom'
 
 export const GuestGuard = () => {
-  const { isLoading, isAuthenticated } = useAuthStore()
+  const { isInitializing, isAuthenticated } = useAuthStore()
 
-  if (isLoading) {
+  if (isInitializing) {
     return <div>Cargando sesion...</div>
   }
 

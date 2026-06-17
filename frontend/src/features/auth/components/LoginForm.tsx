@@ -11,7 +11,8 @@ export const LoginForm = () => {
     errors,
     isSubmitting,
     handleChange,
-    handleSubmit
+    handleSubmit,
+    isFormFilled
   } = useLoginForm()
 
   const [showPassword, setShowPassword] = useState<boolean>(false)
@@ -31,7 +32,7 @@ export const LoginForm = () => {
 
         <div className='relative space-y-3'>
           <div className='relative space-y-1'>
-            <Label htmlFor='email' className='text-[13px] font-semibold text-slate-800 dark:text-[#E5E7EB]'>
+            <Label required htmlFor='email' className='text-[13px] font-semibold text-slate-800 dark:text-[#E5E7EB]'>
               Correo electrónico
             </Label>
             <Input
@@ -50,7 +51,7 @@ export const LoginForm = () => {
           </div>
 
           <div className='relative space-y-1'>
-            <Label htmlFor='password' className='text-[13px] font-semibold text-slate-800 dark:text-[#E5E7EB]'>
+            <Label required htmlFor='password' className='text-[13px] font-semibold text-slate-800 dark:text-[#E5E7EB]'>
               Contraseña
             </Label>
             <div className='relative'>
@@ -86,7 +87,7 @@ export const LoginForm = () => {
           type='submit'
           size='lg'
           className='mt-2 h-11 w-full justify-center gap-2 rounded-lg bg-violet-600 text-white hover:bg-violet-500 dark:bg-[#7C3AED] dark:hover:bg-[#6D28D9]'
-          disabled={isSubmitting}
+          disabled={isSubmitting || !isFormFilled()}
         >
           <span>Ingresar</span>
           <ChevronRight />

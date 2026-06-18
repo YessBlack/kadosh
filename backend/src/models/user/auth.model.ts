@@ -16,7 +16,8 @@ export class AuthModel {
         user: {
           id: result.record.id,
           email: result.record.email,
-          name: result.record.name
+          name: result.record.name,
+          avatar: result.record.avatar
         }
       }
     } catch (error: unknown) {

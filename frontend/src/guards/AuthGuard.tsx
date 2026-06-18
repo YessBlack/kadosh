@@ -1,4 +1,4 @@
-import { SkeletonDashboard } from '../components/shared/SkeletonDashboard'
+import { SkeletonDashboard } from '../components/shared/Skeleton/SkeletonDashboard'
 import { useAuthStore } from '@/store/auth.store'
 import { Navigate, Outlet } from 'react-router-dom'
 

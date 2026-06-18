@@ -30,7 +30,14 @@ export class AuthController {
         maxAge: 7 * 24 * 60 * 60 * 1000
       })
 
-      res.status(200).json({ user: response.user })
+      const { user } = response
+
+      res.status(200).json({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        avatar: user.avatar ?? ''
+      })
     } catch (error: unknown) {
       if (error instanceof Error && error.message === 'Invalid credentials') {
         res.status(401).json({ message: 'Invalid credentials' })

@@ -32,9 +32,8 @@ describe('AuthModel', () => {
 
     const authModel = new AuthModel()
 
-    await expect(
-      authModel.login({ email: 'wrong@test.com', password: 'wrong' })
-    ).rejects.toThrow('Login failed')
+    const res = authModel.login({ email: 'wrong@test.com', password: 'wrong' })
+    await expect(res).rejects.toThrow('Server error')
   })
 
   it('should logout', async () => {

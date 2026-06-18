@@ -3,7 +3,8 @@ import { createApp } from '@/app'
 
 const mockAuthModel = {
   login: jest.fn(),
-  logout: jest.fn()
+  logout: jest.fn(),
+  me: jest.fn()
 }
 
 const app = createApp({ authModel: mockAuthModel })
@@ -22,7 +23,11 @@ describe('AuthController', () => {
       .send({ email: 'test@test.com', password: '123456789' })
 
     expect(res.status).toBe(200)
-    expect(res.body.token).toBe('fake-token')
+    expect(res.body.user).toEqual({
+      id: '123',
+      email: 'test@test.com',
+      name: 'Test'
+    })
   })
 
   it('should return 400 for invalid input', async () => {

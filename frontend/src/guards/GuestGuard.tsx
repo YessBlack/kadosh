@@ -1,4 +1,4 @@
-import { SkeletonAuth } from '@/components/shared/SkeletonAuth'
+import { SkeletonAuth } from '@/components/shared/Skeleton/SkeletonAuth'
 import { useAuthStore } from '@/store/auth.store'
 import { Navigate, Outlet } from 'react-router-dom'
 

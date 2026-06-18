@@ -2,8 +2,8 @@ import { Suspense, type ReactNode } from 'react'
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router-dom'
 import { authRoutes } from './auth.routes'
 import { privateRoutes } from './private.routes'
-import { SkeletonAuth } from '@/components/shared/SkeletonAuth'
-import { SkeletonDashboard } from '@/components/shared/SkeletonDashboard'
+import { SkeletonAuth } from '@/components/shared/Skeleton/SkeletonAuth'
+import { SkeletonDashboard } from '@/components/shared/Skeleton/SkeletonDashboard'
 
 const withSuspense = (element: ReactNode, fallback: ReactNode) => {
   return <Suspense fallback={fallback}>{element}</Suspense>

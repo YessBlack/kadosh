@@ -23,10 +23,11 @@ describe('AuthController', () => {
       .send({ email: 'test@test.com', password: '123456789' })
 
     expect(res.status).toBe(200)
-    expect(res.body.user).toEqual({
+    expect(res.body).toEqual({
       id: '123',
       email: 'test@test.com',
-      name: 'Test'
+      name: 'Test',
+      avatar: ''
     })
   })
 

@@ -6,7 +6,8 @@ export type LoginInput = z.infer<typeof loginSchema>
 export type AuthUser = {
   id: string
   email: string
-  name: string
+  name: string,
+  avatar?: string
 }
 
 export type AuthResponse = {

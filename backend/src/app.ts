@@ -1,11 +1,14 @@
-import express from 'express'
+import express, { Router } from 'express'
 import helmet from 'helmet'
-import { createAuthRouter } from '@/routes/user/auth.routes'
-import { AppDependencies } from './types/dependencies/dependencies.type'
 import { corsMiddleware } from './middlewares/cors'
 import { cookieMiddleware } from './middlewares/cookies'
 
-export const createApp = ({ authModel }: AppDependencies) => {
+type AppRoute = {
+  path: string
+  router: Router
+}
+
+export const createApp = (...routes: AppRoute[]) => {
   const app = express()
 
   app.use(corsMiddleware())
@@ -13,6 +16,7 @@ export const createApp = ({ authModel }: AppDependencies) => {
   app.use(helmet())
   app.use(cookieMiddleware)
 
-  app.use('/api/auth', createAuthRouter({ authModel }))
+  routes.forEach(({ path, router }) => app.use(path, router))
+
   return app
 }

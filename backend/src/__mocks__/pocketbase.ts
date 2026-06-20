@@ -1,14 +1,25 @@
-const mockAuthWithPassword = jest.fn()
-const mockClear = jest.fn()
+export const mockAuthWithPassword = jest.fn()
+export const mockClear = jest.fn()
+export const mockGetFullList = jest.fn()
+export const mockGetOne = jest.fn()
+export const mockGetFirstListItem = jest.fn()
+export const mockCreate = jest.fn()
+export const mockUpdate = jest.fn()
+export const mockDelete = jest.fn()
 
 const PocketBase = jest.fn().mockImplementation(() => ({
   collection: jest.fn().mockReturnValue({
-    authWithPassword: mockAuthWithPassword
+    authWithPassword: mockAuthWithPassword,
+    getFullList: mockGetFullList,
+    getOne: mockGetOne,
+    getFirstListItem: mockGetFirstListItem,
+    create: mockCreate,
+    update: mockUpdate,
+    delete: mockDelete
   }),
   authStore: {
     clear: mockClear
   }
 }))
 
-export { mockAuthWithPassword, mockClear }
 export default PocketBase

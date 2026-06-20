@@ -17,6 +17,7 @@ export class AuthModel {
           id: result.record.id,
           email: result.record.email,
           name: result.record.name,
+          lastname: result.record.lastname,
           avatar: result.record.avatar
         }
       }
@@ -43,7 +44,8 @@ export class AuthModel {
         user: {
           id: result.record.id,
           email: result.record.email,
-          name: result.record.name
+          name: result.record.name,
+          lastname: result.record.lastname
         }
       }
     } catch (error: unknown) {

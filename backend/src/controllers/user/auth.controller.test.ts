@@ -1,5 +1,6 @@
 import request from 'supertest'
 import { createApp } from '@/app'
+import { createAuthRouter } from '@/routes/user/auth.routes'
 
 const mockAuthModel = {
   login: jest.fn(),
@@ -7,15 +8,19 @@ const mockAuthModel = {
   me: jest.fn()
 }
 
-const app = createApp({ authModel: mockAuthModel })
+const app = createApp(
+  { path: '/api/auth', router: createAuthRouter({ authModel: mockAuthModel }) }
+)
 
 describe('AuthController', () => {
   beforeEach(() => jest.clearAllMocks())
 
   it('should return 200 on login successfully', async () => {
+    const mockUser = { id: '123', email: 'test@test.com', name: 'Test' }
+
     mockAuthModel.login.mockResolvedValue({
       token: 'fake-token',
-      user: { id: '123', email: 'test@test.com', name: 'Test' }
+      user: mockUser
     })
 
     const res = await request(app)
@@ -23,12 +28,7 @@ describe('AuthController', () => {
       .send({ email: 'test@test.com', password: '123456789' })
 
     expect(res.status).toBe(200)
-    expect(res.body).toEqual({
-      id: '123',
-      email: 'test@test.com',
-      name: 'Test',
-      avatar: ''
-    })
+    expect(res.body).toEqual(mockUser)
   })
 
   it('should return 400 for invalid input', async () => {

@@ -1,18 +1,12 @@
 import { loginSchema } from '@/schemas/user/auth.schema'
+import { User } from '@/types/user/user.type'
 import { z } from 'zod'
 
 export type LoginInput = z.infer<typeof loginSchema>
 
-export type AuthUser = {
-  id: string
-  email: string
-  name: string,
-  avatar?: string
-}
-
 export type AuthResponse = {
   token: string
-  user: AuthUser
+  user: User
 }
 
 export interface IAuthModel {

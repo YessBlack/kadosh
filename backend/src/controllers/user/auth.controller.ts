@@ -32,12 +32,7 @@ export class AuthController {
 
       const { user } = response
 
-      res.status(200).json({
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        avatar: user.avatar ?? ''
-      })
+      res.status(200).json({ ...user })
     } catch (error: unknown) {
       if (error instanceof Error && error.message === 'Invalid credentials') {
         res.status(401).json({ message: 'Invalid credentials' })
@@ -70,8 +65,9 @@ export class AuthController {
     }
 
     try {
-      const user = await this.authModel.me(token)
-      res.status(200).json({ user })
+      const { user } = await this.authModel.me(token)
+
+      res.status(200).json({ ...user })
     } catch (error: unknown) {
       if (error instanceof Error && error.message === 'Invalid session') {
         res.status(401).json({ message: 'Unauthorized' })

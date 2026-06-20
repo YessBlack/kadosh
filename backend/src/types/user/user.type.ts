@@ -6,7 +6,11 @@ export type User = {
   email: string
   name: string
   lastname: string
-  avatar?: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+  avatar: string,
+  createdBy: string
 }
 
 export type CreateUserInput = z.infer<typeof createUserSchema>

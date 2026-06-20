@@ -12,7 +12,11 @@ export class UserModel {
       email: record.email,
       name: record.name,
       lastname: record.lastname,
-      avatar: record.avatar
+      avatar: record.avatar,
+      isActive: record.isActive,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+      createdBy: record.createdBy
     }
   }
 
@@ -48,7 +52,11 @@ export class UserModel {
         throw new Error('User already exists')
       }
 
-      const result = await pb.collection('users').create(input)
+      const result = await pb.collection('users').create({
+        ...input,
+        emailIsVisibility: true,
+        verified: true
+      })
       return this.toUser(result)
     } catch (error: unknown) {
       if (error instanceof Error && error.message === 'User already exists') {
@@ -63,7 +71,6 @@ export class UserModel {
       const result = await pb.collection('users').update(id, input)
       return this.toUser(result)
     } catch (error: unknown) {
-      console.log(error)
       if (isPocketBaseError(error) && error.status === 404) {
         throw new Error('User not found')
       }

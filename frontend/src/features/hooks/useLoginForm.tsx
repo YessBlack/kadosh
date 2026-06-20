@@ -1,4 +1,4 @@
-import type { LoginData } from '@/features/auth/types/auth.types'
+import type { LoginData } from '@/features/users/types/auth.types'
 import { useAuthStore } from '@/store/auth.store'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'

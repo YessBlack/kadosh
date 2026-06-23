@@ -1,5 +1,5 @@
-import { authApi } from '@/features/auth/api/auth.api'
-import type { LoginData, User } from '@/features/auth/types/auth.types'
+import { authApi } from '@/features/users/api/auth.api'
+import type { LoginData, User } from '@/features/users/types/auth.types'
 import { create } from 'zustand'
 
 interface AuthStore {

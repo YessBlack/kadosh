@@ -18,7 +18,11 @@ export class AuthModel {
           email: result.record.email,
           name: result.record.name,
           lastname: result.record.lastname,
-          avatar: result.record.avatar
+          avatar: result.record.avatar,
+          isActive: result.record.isActive,
+          createdAt: result.record.createdAt,
+          updatedAt: result.record.updatedAt,
+          createdBy: result.record.createdBy
         }
       }
     } catch (error: unknown) {
@@ -45,7 +49,12 @@ export class AuthModel {
           id: result.record.id,
           email: result.record.email,
           name: result.record.name,
-          lastname: result.record.lastname
+          lastname: result.record.lastname,
+          avatar: result.record.avatar,
+          isActive: result.record.isActive,
+          createdAt: result.record.createdAt,
+          updatedAt: result.record.updatedAt,
+          createdBy: result.record.createdBy
         }
       }
     } catch (error: unknown) {

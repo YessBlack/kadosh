@@ -45,7 +45,9 @@ export class UserController {
     }
 
     try {
-      const user = await this.userModel.create(result.data)
+      const user = await this.userModel.create({
+        ...result.data
+      })
       res.status(201).json(user)
     } catch (error) {
       if (error instanceof Error && error.message === 'User already exists') {

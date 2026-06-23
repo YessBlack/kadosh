@@ -1,3 +1,5 @@
+import { SkeletonRows } from '@/components/shared/Skeleton/SkeletonRows'
+import { Button } from '@/components/ui/button'
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useState } from 'react'
@@ -22,6 +24,7 @@ interface DataTableProps<T extends { id: string }> {
   actions?: Action<T>[]
   caption?: string
   pageSize?: number
+  isLoading?: boolean
 }
 
 export function DataTable<T extends { id: string }>({
@@ -29,7 +32,8 @@ export function DataTable<T extends { id: string }>({
   columns,
   actions,
   caption,
-  pageSize = 10
+  pageSize = 10,
+  isLoading = false
 }: DataTableProps<T>) {
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -66,34 +70,38 @@ export function DataTable<T extends { id: string }>({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedData.map(row => (
-              <TableRow key={row.id} className='hover:bg-muted/30'>
-                {actions && (
-                  <TableCell>
-                    <div className='flex gap-2'>
-                      {actions.map((action, i) => (
-                        <button
-                          key={i}
-                          onClick={() => action.onClick(row)}
-                          className={action.className}
-                        >
-                          {action.icon}
-                          {action.label}
-                        </button>
-                      ))}
-                    </div>
-                  </TableCell>
-                )}
-                {columns.map(col => (
-                  <TableCell
-                    key={String(col.key)}
-                    className={col.align === 'right' ? 'text-right' : ''}
-                  >
-                    {col.render ? col.render(row[col.key], row) : String(row[col.key] ?? '')}
-                  </TableCell>
+            {
+              isLoading
+                ? <SkeletonRows rows={pageSize} columns={columns.length} hasActions={!!actions} />
+                : paginatedData.map(row => (
+                  <TableRow key={row.id} className='hover:bg-muted/30'>
+                    {actions && (
+                      <TableCell>
+                        <div className='flex gap-2'>
+                          {actions.map((action, i) => (
+                            <Button
+                              key={i}
+                              onClick={() => action.onClick(row)}
+                              className={action.className}
+                              variant={'secondary'}
+                            >
+                              {action.icon}
+                              {action.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </TableCell>
+                    )}
+                    {columns.map(col => (
+                      <TableCell
+                        key={String(col.key)}
+                        className={col.align === 'right' ? 'text-right' : ''}
+                      >
+                        {col.render ? col.render(row[col.key], row) : String(row[col.key] ?? '')}
+                      </TableCell>
+                    ))}
+                  </TableRow>
                 ))}
-              </TableRow>
-            ))}
           </TableBody>
         </Table>
       </div>

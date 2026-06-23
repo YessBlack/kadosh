@@ -99,7 +99,7 @@ describe('UserController', () => {
     it('should return 400 for invalid input', async () => {
       const res = await request(app)
         .patch('/api/users/1')
-        .send({ email: 'notanemail' })
+        .send({ name: '' })
       expect(res.status).toBe(400)
     })
 

@@ -54,8 +54,7 @@ export class UserModel {
 
       const result = await pb.collection('users').create({
         ...input,
-        emailIsVisibility: true,
-        verified: true
+        emailVisibility: true
       })
       return this.toUser(result)
     } catch (error: unknown) {
@@ -71,6 +70,7 @@ export class UserModel {
       const result = await pb.collection('users').update(id, input)
       return this.toUser(result)
     } catch (error: unknown) {
+      console.log(error)
       if (isPocketBaseError(error) && error.status === 404) {
         throw new Error('User not found')
       }

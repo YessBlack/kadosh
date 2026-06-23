@@ -17,7 +17,7 @@ const createUser = async (data: Partial<User>) => {
 }
 
 const updateUser = async (id: string, data: Partial<User>) => {
-   const response = await api.put(`users/${id}`, data)
+   const response = await api.patch(`users/${id}`, data)
   return response.data
 }
 

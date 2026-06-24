@@ -9,8 +9,9 @@ export type User = {
   isActive: boolean
   createdAt: string
   updatedAt: string
-  avatar: string,
   createdBy: string
+  avatar: string
+  isDeleted: boolean
 }
 
 export type CreateUserInput = z.infer<typeof createUserSchema>

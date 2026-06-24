@@ -71,7 +71,7 @@ export const UserForm = ({ selectedUser, onSuccess }: UserFormProps) => {
           </span>
         </Field>
         <Field className='flex flex-col gap-1'>
-          <Label required>Confirma Contraseña</Label>
+          <Label required>Confirma la Contraseña</Label>
           <Input
             name='passwordConfirm'
             type='text'
@@ -120,7 +120,7 @@ export const UserForm = ({ selectedUser, onSuccess }: UserFormProps) => {
             </Field>
             <Field className='flex flex-col gap-1'>
               <Label required>
-                Correo Electronico
+                Correo Electrónico
               </Label>
               <Input
                 placeholder='doe@email.com'

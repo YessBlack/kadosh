@@ -12,7 +12,10 @@ describe('AuthModel', () => {
       record: {
         id: 'user-id',
         email: 'test@test.com',
-        name: 'Test User'
+        name: 'Test User',
+        lastname: 'User',
+        avatar: 'avatar-url',
+        isDeleted: false
       }
     })
 
@@ -25,6 +28,9 @@ describe('AuthModel', () => {
     expect(result.token).toBe('fake-token')
     expect(result.user.email).toBe('test@test.com')
     expect(result.user.name).toBe('Test User')
+    expect(result.user.lastname).toBe('User')
+    expect(result.user.avatar).toBe('avatar-url')
+    expect(result.user.isDeleted).toBe(false)
   })
 
   it('should throw error with invalid credentials', async () => {

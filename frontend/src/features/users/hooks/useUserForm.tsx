@@ -49,8 +49,10 @@ export const useUserForm = ({ selectedUser, onSuccess }: UseUserFormProps) => {
     try {
       if (selectedUser) {
         await userApi.updateUser(selectedUser.id, values)
+        showToast.success('Éxito', 'Usuario actualizado correctamente')
       } else {
         await userApi.createUser(values)
+        showToast.success('Éxito', 'Usuario creado correctamente')
       }
       onSuccess()
     } catch {
@@ -67,6 +69,7 @@ export const useUserForm = ({ selectedUser, onSuccess }: UseUserFormProps) => {
     try {
       await userApi.deleteUser(selectedUser.id)
       onSuccess()
+      showToast.success('Éxito', 'Usuario eliminado correctamente')
     } catch {
       showToast.error('Error', 'No se pudo eliminar el usuario, intentalo de nuevo')
     } finally {

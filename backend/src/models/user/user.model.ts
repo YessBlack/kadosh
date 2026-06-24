@@ -16,13 +16,16 @@ export class UserModel {
       isActive: record.isActive,
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
-      createdBy: record.createdBy
+      createdBy: record.createdBy,
+      isDeleted: record.isDeleted
     }
   }
 
   async getAll (): Promise<User[]> {
     try {
-      const result = await pb.collection('users').getFullList()
+      const result = await pb.collection('users').getFullList({
+        filter: 'isDeleted=false'
+      })
       return result.map((record) => this.toUser(record))
     } catch (error) {
       throw new Error('Server error')
@@ -32,6 +35,10 @@ export class UserModel {
   async getById (id: string): Promise<User> {
     try {
       const record = await pb.collection('users').getOne(id)
+      if (!record || record.isDeleted) {
+        throw new Error('User not found')
+      }
+
       return this.toUser(record)
     } catch (error: unknown) {
       if (isPocketBaseError(error) && error.status === 404) {
@@ -54,8 +61,11 @@ export class UserModel {
 
       const result = await pb.collection('users').create({
         ...input,
-        emailVisibility: true
+        emailVisibility: true,
+        avatar: '',
+        isDeleted: false
       })
+
       return this.toUser(result)
     } catch (error: unknown) {
       if (error instanceof Error && error.message === 'User already exists') {
@@ -70,7 +80,6 @@ export class UserModel {
       const result = await pb.collection('users').update(id, input)
       return this.toUser(result)
     } catch (error: unknown) {
-      console.log(error)
       if (isPocketBaseError(error) && error.status === 404) {
         throw new Error('User not found')
       }
@@ -80,7 +89,7 @@ export class UserModel {
 
   async delete (id: string): Promise<void> {
     try {
-      await pb.collection('users').delete(id)
+      await pb.collection('users').update(id, { isDeleted: true })
     } catch (error: unknown) {
       if (isPocketBaseError(error) && error.status === 404) {
         throw new Error('User not found')

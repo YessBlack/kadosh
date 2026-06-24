@@ -22,7 +22,8 @@ export class AuthModel {
           isActive: result.record.isActive,
           createdAt: result.record.createdAt,
           updatedAt: result.record.updatedAt,
-          createdBy: result.record.createdBy
+          createdBy: result.record.createdBy,
+          isDeleted: result.record.isDeleted
         }
       }
     } catch (error: unknown) {
@@ -54,7 +55,8 @@ export class AuthModel {
           isActive: result.record.isActive,
           createdAt: result.record.createdAt,
           updatedAt: result.record.updatedAt,
-          createdBy: result.record.createdBy
+          createdBy: result.record.createdBy,
+          isDeleted: result.record.isDeleted
         }
       }
     } catch (error: unknown) {

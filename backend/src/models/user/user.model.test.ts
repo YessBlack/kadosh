@@ -1,4 +1,4 @@
-import { mockCreate, mockDelete, mockGetFirstListItem, mockGetFullList, mockGetOne, mockUpdate } from '@/__mocks__/pocketbase'
+import { mockCreate, mockGetFirstListItem, mockGetFullList, mockGetOne, mockUpdate } from '@/__mocks__/pocketbase'
 import { UserModel } from '@/models/user/user.model'
 import { CreateUserInput, UpdateUserInput } from '@/types/user/user.type'
 
@@ -125,8 +125,8 @@ describe('UserModel', () => {
 
   describe('delete', () => {
     it('should delete an existing user', async () => {
-      mockGetOne.mockResolvedValue({ id: '1', email: 'test@test.com' })
-      mockDelete.mockResolvedValue(undefined)
+      mockGetOne.mockResolvedValue({ id: '1', email: 'test@test.com', isDeleted: false })
+      mockUpdate.mockResolvedValue(undefined)
 
       const model = new UserModel()
       await model.delete('1')
@@ -135,14 +135,14 @@ describe('UserModel', () => {
     it('should throw "User not found" if PocketBase returns 404', async () => {
       const error = new Error('Not found') as unknown as { status: number }
       error.status = 404
-      mockDelete.mockRejectedValue(error)
+      mockUpdate.mockRejectedValue(error)
 
       const model = new UserModel()
       await expect(model.delete('999')).rejects.toThrow('User not found')
     })
 
     it('should throw "Server error" for non-404 errors', async () => {
-      mockDelete.mockRejectedValue(new Error('db error'))
+      mockUpdate.mockRejectedValue(new Error('db error'))
       const model = new UserModel()
       await expect(model.delete('1')).rejects.toThrow('Server error')
     })

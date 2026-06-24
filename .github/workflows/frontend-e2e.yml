@@ -45,8 +45,13 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
+      - name: Create .env file
+        run: echo "VITE_API_BASE_URL=http://localhost:3000/api/" > .env
+
       - name: Run E2E tests
         run: npx playwright test
+        env:
+          CI: true
 
       - name: Generate Summary
         if: always()

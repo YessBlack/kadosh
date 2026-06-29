@@ -5,7 +5,8 @@ import { createAuthRouter } from '@/routes/user/auth.routes'
 const mockAuthModel = {
   login: jest.fn(),
   logout: jest.fn(),
-  me: jest.fn()
+  me: jest.fn(),
+  changePassword: jest.fn()
 }
 
 const app = createApp(

@@ -16,7 +16,8 @@ export class UserModel {
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
       createdBy: record.createdBy,
-      isDeleted: record.isDeleted
+      isDeleted: record.isDeleted,
+      phone: record.phone
     }
   }
 

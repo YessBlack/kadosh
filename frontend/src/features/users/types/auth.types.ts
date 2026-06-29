@@ -7,6 +7,7 @@ export type User = {
   isActive: boolean
   createdBy: string
   lastLogin: string
+  phone?: string
   readonly createdAt: string
   readonly updatedAt: string
 }
@@ -14,4 +15,10 @@ export type User = {
 export interface LoginData {
   email: string
   password: string
+}
+
+export interface ChangePasswordData {
+  currentPassword: string
+  newPassword: string
+  newPasswordConfirm: string
 }

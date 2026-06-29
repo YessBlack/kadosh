@@ -12,6 +12,7 @@ export type User = {
   createdBy: string
   avatar: string
   isDeleted: boolean
+  phone?: string
   lastLogin?: string
 }
 

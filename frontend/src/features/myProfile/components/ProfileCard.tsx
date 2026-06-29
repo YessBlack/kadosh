@@ -49,7 +49,7 @@ export const ProfileCard = () => {
   }
 
   return (
-    <div className='rounded-2xl border border-border  bg-background shadow-sm'>
+    <div className='rounded-2xl border border-border bg-background shadow-xs'>
 
       <div
         className='h-30 w-full rounded-t-[14px]'

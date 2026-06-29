@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
-import { validateLogin } from '@/schemas/user/auth.schema'
+import { validateChangePassword, validateLogin } from '@/schemas/user/auth.schema'
 import { IAuthModel } from '@/types/user/auth.type'
+import { sendValidationError } from '@/utils/validation.utils'
 
 interface AuthControllerDeps {
   authModel: IAuthModel
@@ -71,6 +72,29 @@ export class AuthController {
     } catch (error: unknown) {
       if (error instanceof Error && error.message === 'Invalid session') {
         res.status(401).json({ message: 'Unauthorized' })
+        return
+      }
+      res.status(500).json({ message: 'Server error' })
+    }
+  }
+
+  changePassword = async (req: Request, res: Response) => {
+    const token = req.cookies.token
+
+    if (!token) {
+      res.status(401).json({ message: 'Unauthorized' })
+      return
+    }
+
+    const result = validateChangePassword(req.body)
+    if (!result.success) return sendValidationError(res, result.error)
+
+    try {
+      await this.authModel.changePassword(token, result.data)
+      res.status(200).json({ message: 'Password updated successfully' })
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message === 'Invalid current password') {
+        res.status(401).json({ message: 'Invalid current password' })
         return
       }
       res.status(500).json({ message: 'Server error' })

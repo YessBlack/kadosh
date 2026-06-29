@@ -11,9 +11,9 @@ export const ProfilePage = () => {
           Consulta y actualiza tu información personal, administra los datos de tu cuenta y cambia tu contraseña para mantener tu acceso seguro y actualizado.
         </p>
       </div>
-      <div className='grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6'>
+      <div className='grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6 items-start'>
         <ProfileCard />
-        <div>
+        <div className='flex flex-col gap-3'>
           <PersonalInfoForm />
           <SecurityCard />
         </div>

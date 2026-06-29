@@ -5,7 +5,8 @@ const baseUserSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
   lastname: z.string().min(1, { message: 'Lastname is required' }),
   avatar: z.string().optional(),
-  isActive: z.boolean().optional()
+  isActive: z.boolean().optional(),
+  phone: z.string().optional()
 })
 
 export const createUserSchema = baseUserSchema.extend({

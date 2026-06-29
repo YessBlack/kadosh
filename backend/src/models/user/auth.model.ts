@@ -1,4 +1,4 @@
-import { AuthResponse, LoginInput } from '@/types/user/auth.type'
+import { AuthResponse, ChangePasswordInput, LoginInput } from '@/types/user/auth.type'
 import { isPocketBaseError } from '@/utils/pocketbase.error'
 import PocketBase from 'pocketbase'
 
@@ -30,6 +30,7 @@ export class AuthModel {
           updatedAt: result.record.updatedAt,
           createdBy: result.record.createdBy,
           isDeleted: result.record.isDeleted,
+          phone: result.record.phone,
           lastLogin
         }
       }
@@ -64,12 +65,34 @@ export class AuthModel {
           updatedAt: result.record.updatedAt,
           createdBy: result.record.createdBy,
           isDeleted: result.record.isDeleted,
-          lastLogin: result.record.lastLogin
+          lastLogin: result.record.lastLogin,
+          phone: result.record.phone
         }
       }
     } catch (error: unknown) {
       if (isPocketBaseError(error) && error.status === 401) {
         throw new Error('Invalid session')
+      }
+      throw new Error('Server error')
+    }
+  }
+
+  async changePassword (token: string, { currentPassword, newPassword }: ChangePasswordInput): Promise<void> {
+    try {
+      pb.authStore.save(token, null)
+
+      const { record } = await pb.collection('users').authRefresh()
+
+      await pb.collection('users').authWithPassword(record.email, currentPassword)
+
+      await pb.collection('users').update(record.id, {
+        password: newPassword,
+        passwordConfirm: newPassword,
+        oldPassword: currentPassword
+      })
+    } catch (error: unknown) {
+      if (isPocketBaseError(error) && error.status === 400) {
+        throw new Error('Invalid current password')
       }
       throw new Error('Server error')
     }

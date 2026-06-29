@@ -55,7 +55,7 @@ export const SecurityCard = () => {
 
   return (
     <div className='border rounded-2xl flex flex-col overflow-hidden shadow-xs'>
-      <div className='flex justify-between items-center bg-slate-100 px-4 py-3 rounded-t-2xl border-b'>
+      <div className='flex justify-between items-center bg-slate-100 px-4 py-3 rounded-t-2xl border-b dark:bg-slate-800/70'>
         <h1 className='font-bold text-lg m-0'>Seguridad</h1>
         <LockKeyhole size={18} />
       </div>

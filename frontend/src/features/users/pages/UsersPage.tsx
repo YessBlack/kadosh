@@ -15,16 +15,6 @@ export const UsersPage = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleEdit = (user: User) => {
-    setSelectedUser(user)
-    setModalOpen(true)
-  }
-
-  const handleCreate = () => {
-    setSelectedUser(null)
-    setModalOpen(true)
-  }
-
   useEffect(() => {
     const getUsers = async () => {
       setIsLoading(true)
@@ -34,6 +24,16 @@ export const UsersPage = () => {
     }
     getUsers()
   }, [])
+
+  const handleEdit = (user: User) => {
+    setSelectedUser(user)
+    setModalOpen(true)
+  }
+
+  const handleCreate = () => {
+    setSelectedUser(null)
+    setModalOpen(true)
+  }
 
   const handleSuccess = async () => {
     setIsLoading(true)

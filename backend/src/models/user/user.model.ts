@@ -3,7 +3,6 @@ import { CreateUserInput, User, UpdateUserInput } from '@/types/user/user.type'
 import { isPocketBaseError } from '@/utils/pocketbase.error'
 
 const pb = new PocketBase(process.env.POCKETBASE_URL)
-console.log(process.env.POCKETBASE_URL)
 
 export class UserModel {
   private toUser (record: RecordModel): User {
@@ -12,7 +11,7 @@ export class UserModel {
       email: record.email,
       name: record.name,
       lastname: record.lastname,
-      avatar: record.avatar,
+      avatar: pb.files.getURL(record, record.avatar),
       isActive: record.isActive,
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
@@ -85,6 +84,14 @@ export class UserModel {
       }
       throw new Error('Server error')
     }
+  }
+
+  async updateAvatar (id: string, file: Blob): Promise<User> {
+    const formData = new FormData()
+    formData.append('avatar', file)
+
+    const record = await pb.collection('users').update(id, formData)
+    return this.toUser(record)
   }
 
   async delete (id: string): Promise<void> {

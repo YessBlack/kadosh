@@ -72,6 +72,28 @@ export class UserController {
     }
   }
 
+  updateAvatar = async (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params
+    const file = req.file
+      ? new Blob([req.file.buffer as unknown as ArrayBuffer], { type: req.file.mimetype })
+      : null
+
+    if (!file) {
+      return res.status(400).json({ error: { message: 'No file provided' } })
+    }
+
+    try {
+      const user = await this.userModel.updateAvatar(id, file)
+      res.status(200).json(user)
+    } catch (error) {
+      if (error instanceof Error && error.message === 'User not found') {
+        res.status(404).json({ error: { message: 'User not found' } })
+        return
+      }
+      res.status(500).json({ error: { message: 'Error updating user' } })
+    }
+  }
+
   delete = async (req: Request<{ id: string }>, res: Response) => {
     const { id } = req.params
     try {

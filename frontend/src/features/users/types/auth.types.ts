@@ -6,6 +6,7 @@ export type User = {
   avatar?: string
   isActive: boolean
   createdBy: string
+  lastLogin: string
   readonly createdAt: string
   readonly updatedAt: string
 }

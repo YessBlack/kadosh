@@ -67,9 +67,9 @@ export const LoginForm = () => {
               />
               <Button
                 type='button'
-                variant='ghost'
+                variant='link'
                 size='icon-sm'
-                className='mt-2 absolute right-1 top-1/2 -translate-y-1/2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 active:translate-y-[-50%]! active:scale-100! dark:text-[#9CA3AF] dark:hover:bg-[#1E1B4B]/50 dark:hover:text-[#E5E7EB]'
+                className='absolute right-1 top-1/2 -translate-y-1/2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 active:translate-y-[-50%]! active:scale-100! dark:text-[#9CA3AF] dark:hover:bg-[#1E1B4B]/50 dark:hover:text-[#E5E7EB]'
                 onClick={() => setShowPassword((v) => !v)}
               >
                 <span className='inline-flex size-4 items-center justify-center'>

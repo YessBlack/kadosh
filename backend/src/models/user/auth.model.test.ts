@@ -1,4 +1,4 @@
-import { mockAuthWithPassword, mockClear } from '@/__mocks__/pocketbase'
+import { mockAuthWithPassword, mockClear, mockGetURL } from '@/__mocks__/pocketbase'
 import { AuthModel } from './auth.model'
 
 describe('AuthModel', () => {
@@ -7,6 +7,7 @@ describe('AuthModel', () => {
   })
 
   it('should login with valid credentials', async () => {
+    mockGetURL.mockReturnValue('avatar-url')
     mockAuthWithPassword.mockResolvedValue({
       token: 'fake-token',
       record: {

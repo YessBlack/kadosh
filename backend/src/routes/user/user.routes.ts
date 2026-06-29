@@ -1,4 +1,5 @@
 import { UserController } from '@/controllers/user/user.controller'
+import { uploadSingle } from '@/middlewares/upload'
 import { IUserModel } from '@/types/user/user.type'
 import { Router } from 'express'
 
@@ -15,6 +16,7 @@ export const createUserRouter = ({ userModel }: UserRoutesDeps) => {
   userRouter.post('/', userController.create)
   userRouter.patch('/:id', userController.update)
   userRouter.delete('/:id', userController.delete)
+  userRouter.patch('/:id/avatar', uploadSingle('avatar'), userController.updateAvatar)
 
   return userRouter
 }

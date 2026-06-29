@@ -1,4 +1,5 @@
 import { DashboardPage } from '@/features/dashboard/page/DashboardPage'
+import { ProfilePage } from '@/features/myProfile/pages/ProfilePage'
 import { UsersPage } from '@/features/users/pages/UsersPage'
 import { AuthGuard } from '@/guards/AuthGuard'
 import { AppLayout } from '@/layouts/AppLayout'
@@ -17,7 +18,7 @@ export const privateRoutes: RouteObject[] = [
           { path: '/inventario', element: <div>Inventario</div> },
           { path: '/usuarios', element: <UsersPage /> },
           { path: '/negocio', element: <div>Mi Negocio</div> },
-          { path: '/perfil', element: <div>Mi Perfil</div> }
+          { path: '/perfil', element: <ProfilePage /> }
         ]
       }
     ]

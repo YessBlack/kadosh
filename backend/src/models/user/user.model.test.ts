@@ -1,4 +1,4 @@
-import { mockCreate, mockGetFirstListItem, mockGetFullList, mockGetOne, mockUpdate } from '@/__mocks__/pocketbase'
+import { mockCreate, mockGetFirstListItem, mockGetFullList, mockGetOne, mockUpdate, mockGetURL } from '@/__mocks__/pocketbase'
 import { UserModel } from '@/models/user/user.model'
 import { CreateUserInput, UpdateUserInput } from '@/types/user/user.type'
 
@@ -120,6 +120,42 @@ describe('UserModel', () => {
       mockUpdate.mockRejectedValue(new Error('db error'))
       const model = new UserModel()
       await expect(model.update('1', {} as UpdateUserInput)).rejects.toThrow('Server error')
+    })
+  })
+
+  describe('updateAvatar', () => {
+    it('should update avatar and return the user', async () => {
+      const mockRecord = {
+        id: '1',
+        avatar: 'foto.jpg',
+        email: 'test@test.com',
+        name: 'Test',
+        lastname: 'User',
+        isActive: true,
+        isDeleted: false,
+        createdAt: '2026-01-01',
+        updatedAt: '2026-01-01',
+        createdBy: 'admin'
+      }
+      const mockUrl = 'http://pocketbase.io/files/users/1/foto.jpg'
+
+      mockUpdate.mockResolvedValue(mockRecord)
+      mockGetURL.mockReturnValue(mockUrl)
+
+      const model = new UserModel()
+      const result = await model.updateAvatar('1', new Blob())
+
+      expect(mockUpdate).toHaveBeenCalledWith('1', expect.any(FormData))
+      expect(mockGetURL).toHaveBeenCalledWith(mockRecord, mockRecord.avatar)
+      expect(result).toEqual({ ...mockRecord, avatar: mockUrl })
+    })
+
+    it('Should throw if user not found', async () => {
+      mockUpdate.mockRejectedValue(new Error('User not found'))
+
+      const model = new UserModel()
+
+      await expect(model.updateAvatar('1', new Blob())).rejects.toThrow('User not found')
     })
   })
 

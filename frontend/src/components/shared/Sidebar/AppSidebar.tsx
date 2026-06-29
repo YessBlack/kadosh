@@ -1,4 +1,5 @@
 import { mainItems, settingsItems } from '@/components/shared/Sidebar/sidebar.config'
+import { UserAvatar } from '@/components/shared/User/UserAvatar'
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenu } from '@/components/ui/dropdown-menu'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
 import { useAuthStore } from '@/store/auth.store'
@@ -84,10 +85,11 @@ export const AppSidebar = () => {
                     size='lg'
                     className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
                   >
-                    <img
-                      src={user?.avatar || 'https://github.com/shadcn.png'}
-                      alt='shadcn'
-                      className='size-8 rounded-full object-cover'
+                    <UserAvatar
+                      imageUrl={user?.avatar}
+                      name={user?.name}
+                      lastname={user?.lastname}
+                      className={user?.avatar ? 'w-10 h-10' : ''}
                     />
                     <div className='grid flex-1 text-left text-sm leading-tight'>
                       <span className='truncate font-semibold'>{`${user?.name} ${user?.lastname}`}</span>
@@ -98,7 +100,7 @@ export const AppSidebar = () => {
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent side='top' align='start' className='w-56'>
-                  <DropdownMenuItem><Link to='/perfil'>Mi Perfil</Link></DropdownMenuItem>
+                  <Link to='/perfil'><DropdownMenuItem>Mi Perfil</DropdownMenuItem></Link>
                   <DropdownMenuItem onClick={logout}>Cerrar Sesión</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

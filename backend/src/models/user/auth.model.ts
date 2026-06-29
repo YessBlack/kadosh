@@ -11,6 +11,12 @@ export class AuthModel {
         .collection('users')
         .authWithPassword(email, password)
 
+      const lastLogin = new Date().toISOString()
+
+      await pb.collection('users').update(result.record.id, {
+        lastLogin
+      })
+
       return {
         token: result.token,
         user: {
@@ -18,12 +24,13 @@ export class AuthModel {
           email: result.record.email,
           name: result.record.name,
           lastname: result.record.lastname,
-          avatar: result.record.avatar,
+          avatar: pb.files.getURL(result.record, result.record.avatar),
           isActive: result.record.isActive,
           createdAt: result.record.createdAt,
           updatedAt: result.record.updatedAt,
           createdBy: result.record.createdBy,
-          isDeleted: result.record.isDeleted
+          isDeleted: result.record.isDeleted,
+          lastLogin
         }
       }
     } catch (error: unknown) {
@@ -51,12 +58,13 @@ export class AuthModel {
           email: result.record.email,
           name: result.record.name,
           lastname: result.record.lastname,
-          avatar: result.record.avatar,
+          avatar: pb.files.getURL(result.record, result.record.avatar),
           isActive: result.record.isActive,
           createdAt: result.record.createdAt,
           updatedAt: result.record.updatedAt,
           createdBy: result.record.createdBy,
-          isDeleted: result.record.isDeleted
+          isDeleted: result.record.isDeleted,
+          lastLogin: result.record.lastLogin
         }
       }
     } catch (error: unknown) {

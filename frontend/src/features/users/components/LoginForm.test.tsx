@@ -1,5 +1,5 @@
-import { LoginForm } from '@/features/auth/components/LoginForm'
-import { useLoginForm } from '@/features/hooks/useLoginForm'
+import { LoginForm } from '@/features/users/components/LoginForm'
+import { useLoginForm } from '@/features/users/hooks/useLoginForm'
 import { render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'

@@ -1,11 +1,12 @@
-import { authApi } from '@/features/auth/api/auth.api'
-import type { LoginData, User } from '@/features/auth/types/auth.types'
+import { authApi } from '@/features/users/api/auth.api'
+import type { LoginData, User } from '@/features/users/types/auth.types'
 import { create } from 'zustand'
 
 interface AuthStore {
   user: User | null
   isAuthenticated: boolean
   isInitializing: boolean
+  setUser: (user: Partial<User> | null) => void
   initialize: () => Promise<void>
   login: (data: LoginData) => Promise<void>
   logout: () => Promise<void>
@@ -47,5 +48,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
       })
       throw error
     }
+  },
+
+ setUser: (userData: Partial<User> | null) => {
+    set((state) => ({
+      user: userData === null ? null : state.user ? { ...state.user, ...userData } : null
+    }))
   }
 }))

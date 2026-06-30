@@ -1,4 +1,4 @@
-import { authApi } from '@/features/auth/api/auth.api'
+import { authApi } from '@/features/users/api/auth.api'
 import api from '@/lib/axios'
 import { describe, vi, it, beforeEach, expect } from 'vitest'
 

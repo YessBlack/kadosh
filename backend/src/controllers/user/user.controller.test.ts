@@ -7,6 +7,7 @@ const mockUserModel = {
   getById: jest.fn(),
   create: jest.fn(),
   update: jest.fn(),
+  updateAvatar: jest.fn(),
   delete: jest.fn()
 }
 
@@ -99,7 +100,7 @@ describe('UserController', () => {
     it('should return 400 for invalid input', async () => {
       const res = await request(app)
         .patch('/api/users/1')
-        .send({ email: 'notanemail' })
+        .send({ name: '' })
       expect(res.status).toBe(400)
     })
 
@@ -119,6 +120,62 @@ describe('UserController', () => {
         .patch('/api/users/1')
         .send({ name: 'John', lastname: 'Doe' })
       expect(res.status).toBe(500)
+    })
+  })
+
+  describe('PATCH /api/users/:id/avatar', () => {
+    it('should return 200 with updated user', async () => {
+      const mockUser = {
+        id: '1',
+        email: 'test@test.com',
+        name: 'Test',
+        lastname: 'User',
+        avatar: 'http://pocketbase.io/files/users/1/foto.jpg',
+        isActive: true,
+        isDeleted: false,
+        createdAt: '2026-01-01',
+        updatedAt: '2026-01-01',
+        createdBy: 'admin',
+        lastLogin: '2026-01-01'
+      }
+      mockUserModel.updateAvatar.mockResolvedValue(mockUser)
+
+      const res = await request(app)
+        .patch('/api/users/1/avatar')
+        .attach('avatar', Buffer.from('fake-image'), 'foto.jpg')
+
+      expect(res.status).toBe(200)
+      expect(res.body).toEqual(mockUser)
+    })
+
+    it('should return 404 if user not found', async () => {
+      mockUserModel.updateAvatar.mockRejectedValue(new Error('User not found'))
+
+      const res = await request(app)
+        .patch('/api/users/1/avatar')
+        .attach('avatar', Buffer.from('fake-image'), 'foto.jpg')
+
+      expect(res.status).toBe(404)
+      expect(res.body).toEqual({ error: { message: 'User not found' } })
+    })
+
+    it('should return 500 on server error', async () => {
+      mockUserModel.updateAvatar.mockRejectedValue(new Error('Server error'))
+
+      const res = await request(app)
+        .patch('/api/users/1/avatar')
+        .attach('avatar', Buffer.from('fake-image'), 'foto.jpg')
+
+      expect(res.status).toBe(500)
+      expect(res.body).toEqual({ error: { message: 'Error updating user' } })
+    })
+
+    it('should return 400 if no file provided', async () => {
+      const res = await request(app)
+        .patch('/api/users/1/avatar')
+
+      expect(res.status).toBe(400)
+      expect(res.body).toEqual({ error: { message: 'No file provided' } })
     })
   })
 

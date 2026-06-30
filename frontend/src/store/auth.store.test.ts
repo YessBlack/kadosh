@@ -1,10 +1,10 @@
-import { authApi } from '@/features/auth/api/auth.api'
-import type { User } from '@/features/auth/types/auth.types'
+import { authApi } from '@/features/users/api/auth.api'
+import type { User } from '@/features/users/types/auth.types'
 import { useAuthStore } from '@/store/auth.store'
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, vi, it, expect } from 'vitest'
 
-vi.mock('@/features/auth/api/auth.api')
+vi.mock('@/features/users/api/auth.api')
 
 const mockAuthApi = vi.mocked(authApi)
 

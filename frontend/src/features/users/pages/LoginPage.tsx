@@ -1,5 +1,5 @@
-import { KadoshArc } from '@/features/auth/components/KadoshArc'
-import { LoginForm } from '@/features/auth/components/LoginForm'
+import { KadoshArc } from '@/features/users/components/KadoshArc'
+import { LoginForm } from '@/features/users/components/LoginForm'
 import { BoxIcon, ChartColumn } from 'lucide-react'
 
 export default function LoginPage() {

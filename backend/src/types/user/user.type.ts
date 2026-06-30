@@ -6,7 +6,14 @@ export type User = {
   email: string
   name: string
   lastname: string
-  avatar?: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+  createdBy: string
+  avatar: string
+  isDeleted: boolean
+  phone?: string
+  lastLogin?: string
 }
 
 export type CreateUserInput = z.infer<typeof createUserSchema>
@@ -17,5 +24,6 @@ export interface IUserModel {
   getById: (id: string) => Promise<User | null>
   create: (input: CreateUserInput) => Promise<User>
   update: (id: string, input: UpdateUserInput) => Promise<User>
+  updateAvatar: (id: string, file: Blob) => Promise<User>
   delete: (id: string) => Promise<void>
 }

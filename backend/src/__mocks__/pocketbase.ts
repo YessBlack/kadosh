@@ -5,7 +5,7 @@ export const mockGetOne = jest.fn()
 export const mockGetFirstListItem = jest.fn()
 export const mockCreate = jest.fn()
 export const mockUpdate = jest.fn()
-export const mockDelete = jest.fn()
+export const mockGetURL = jest.fn()
 
 const PocketBase = jest.fn().mockImplementation(() => ({
   collection: jest.fn().mockReturnValue({
@@ -14,11 +14,13 @@ const PocketBase = jest.fn().mockImplementation(() => ({
     getOne: mockGetOne,
     getFirstListItem: mockGetFirstListItem,
     create: mockCreate,
-    update: mockUpdate,
-    delete: mockDelete
+    update: mockUpdate
   }),
   authStore: {
     clear: mockClear
+  },
+  files: {
+    getURL: mockGetURL
   }
 }))
 

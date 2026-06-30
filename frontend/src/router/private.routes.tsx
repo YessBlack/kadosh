@@ -1,4 +1,6 @@
 import { DashboardPage } from '@/features/dashboard/page/DashboardPage'
+import { ProfilePage } from '@/features/myProfile/pages/ProfilePage'
+import { UsersPage } from '@/features/users/pages/UsersPage'
 import { AuthGuard } from '@/guards/AuthGuard'
 import { AppLayout } from '@/layouts/AppLayout'
 import type { RouteObject } from 'react-router-dom'
@@ -14,9 +16,9 @@ export const privateRoutes: RouteObject[] = [
           { path: '/ventas', element: <div>Ventas</div> },
           { path: '/gastos', element: <div>Gastos</div> },
           { path: '/inventario', element: <div>Inventario</div> },
-          { path: '/usuarios', element: <div>Usuarios</div> },
+          { path: '/usuarios', element: <UsersPage /> },
           { path: '/negocio', element: <div>Mi Negocio</div> },
-          { path: '/perfil', element: <div>Mi Perfil</div> }
+          { path: '/perfil', element: <ProfilePage /> }
         ]
       }
     ]

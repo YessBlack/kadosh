@@ -1,5 +1,6 @@
 import { AppAlert } from '@/components/common/Alert/Alert'
 import { ALERT_VARIANT } from '@/components/common/Alert/alert.type'
+import { PasswordInput } from '@/components/common/PasswordInput/PasswordInput'
 import { Button } from '@/components/ui/button'
 import {
   Field,
@@ -58,26 +59,24 @@ export const UserForm = ({ selectedUser, onSuccess }: UserFormProps) => {
     return (
       <>
         <Field className='flex flex-col gap-1'>
-          <Label required>Contraseña</Label>
-          <Input
+          <PasswordInput
             name='password'
-            type='text'
-            placeholder='Mínimo 8 caracteres'
+            label='Contraseña'
             value={values.password}
             onChange={handleChange}
+            required
           />
           <span className='text-xs text-slate-500/70 italic'>
             Recuerda que la contraseña debe tener al menos 8 caracteres y coincidir en ambos campos.
           </span>
         </Field>
         <Field className='flex flex-col gap-1'>
-          <Label required>Confirma la Contraseña</Label>
-          <Input
+          <PasswordInput
             name='passwordConfirm'
-            type='text'
-            placeholder='Repite la contraseña'
+            label='Repite la contraseña'
             value={values.passwordConfirm}
             onChange={handleChange}
+            required
           />
         </Field>
       </>
@@ -118,26 +117,28 @@ export const UserForm = ({ selectedUser, onSuccess }: UserFormProps) => {
                 onChange={handleChange}
               />
             </Field>
-            <Field className='flex flex-col gap-1'>
-              <Label required>
-                Correo Electrónico
-              </Label>
-              <Input
-                placeholder='doe@email.com'
-                type='email'
-                required
-                name='email'
-                value={values.email}
-                onChange={handleChange}
-              />
-            </Field>
+            {!selectedUser &&
+              <Field className='flex flex-col gap-1'>
+                <Label required>
+                  Correo Electrónico
+                </Label>
+                <Input
+                  placeholder='doe@email.com'
+                  type='email'
+                  required
+                  name='email'
+                  value={values.email}
+                  onChange={handleChange}
+                />
+              </Field>
+            }
             {renderConfirmPassword()}
             <Field className='flex flex-col gap-1'>
               <Label required className='text-sm font-medium'>
                 Estado
               </Label>
               <RadioGroup
-                defaultValue='true'
+                value={values.isActive ? 'true' : 'false'}
                 className='w-fit'
                 onValueChange={(value) => setValues(prev => ({ ...prev, isActive: value === 'true' }))}
               >

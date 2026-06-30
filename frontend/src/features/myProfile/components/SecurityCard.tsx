@@ -68,14 +68,14 @@ export const SecurityCard = () => {
         <form onSubmit={handleSubmit} className='w-full flex flex-col gap-4'>
           <PasswordInput
             name='password'
-            label='Contraseña'
+            label='Contraseña Actual'
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
             required
           />
           <PasswordInput
             name='password'
-            label='Contraseña'
+            label='Nueva Contraseña'
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             required
@@ -83,7 +83,7 @@ export const SecurityCard = () => {
 
           <PasswordInput
             name='password'
-            label='Contraseña'
+            label='Confirma tu Contraseña'
             value={passwordConfirm}
             onChange={(e) => setPasswordConfirm(e.target.value)}
             required

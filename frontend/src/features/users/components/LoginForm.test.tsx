@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
 
-vi.mock('@/features/hooks/useLoginForm')
+vi.mock('@/features/users/hooks/useLoginForm')
 
 const mockUseLoginForm = vi.mocked(useLoginForm)
 

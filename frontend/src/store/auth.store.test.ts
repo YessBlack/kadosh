@@ -50,7 +50,7 @@ describe('useAuthStore', () => {
   describe('login', () => {
     it('should set user and isAuthenticated true on successful login', async () => {
       const fakeUser = { id: '1', email: 'test@test.com', name: 'Test' } as User
-      mockAuthApi.me.mockResolvedValue(fakeUser)
+      mockAuthApi.login.mockResolvedValue(fakeUser)
 
       const { result } = renderHook(() => useAuthStore())
 
@@ -110,7 +110,8 @@ describe('useAuthStore', () => {
 
       const res = act(async () => { await result.current.logout()})
 
-      expect(res).rejects.toThrow('Network error')
+      await expect(res).rejects.toThrow('Network error')
+
       expect(result.current.user).toBeNull()
       expect(result.current.isAuthenticated).toBe(false)
     })

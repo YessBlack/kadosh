@@ -60,6 +60,9 @@ export default defineConfig([
       'react/react-in-jsx-scope': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
       'react-refresh/only-export-components': 'off',
+
+      'no-useless-constructor': 'off',
+      '@typescript-eslint/no-useless-constructor': 'error'
     },
   },
 ])

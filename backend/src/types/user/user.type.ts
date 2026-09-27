@@ -16,14 +16,6 @@ export type User = {
   lastLogin?: string
 }
 
+// request DTO
 export type CreateUserInput = z.infer<typeof createUserSchema>
 export type UpdateUserInput = z.infer<typeof updateUserSchema>
-
-export interface IUserModel {
-  getAll: () => Promise<User[]>
-  getById: (id: string) => Promise<User | null>
-  create: (input: CreateUserInput) => Promise<User>
-  update: (id: string, input: UpdateUserInput) => Promise<User>
-  updateAvatar: (id: string, file: Blob) => Promise<User>
-  delete: (id: string) => Promise<void>
-}

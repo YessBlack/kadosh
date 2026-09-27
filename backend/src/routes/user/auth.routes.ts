@@ -1,19 +1,17 @@
-import { Router } from 'express'
 import { AuthController } from '@/controllers/user/auth.controller'
-import { IAuthModel } from '@/types/user/auth.type'
+import { Router } from 'express'
 
 interface AuthRouterDeps {
-  authModel: IAuthModel
+  authController: AuthController
 }
 
-export const createAuthRouter = ({ authModel }: AuthRouterDeps) => {
-  const authRouter = Router()
-  const authController = new AuthController({ authModel })
+export const createAuthRouter = ({ authController }: AuthRouterDeps): Router => {
+  const router = Router()
 
-  authRouter.post('/login', authController.login)
-  authRouter.post('/logout', authController.logout)
-  authRouter.get('/me', authController.me)
-  authRouter.post('/changePassword', authController.changePassword)
+  router.post('/login', authController.login)
+  router.post('/logout', authController.logout)
+  router.get('/me', authController.me)
+  router.post('/change-password', authController.changePassword)
 
-  return authRouter
+  return router
 }

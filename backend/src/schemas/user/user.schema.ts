@@ -1,7 +1,12 @@
 import { z } from 'zod'
 
+const userEmailSchema = z.string().email({ message: 'Invalid email' }).refine(
+  email => !email.toLowerCase().endsWith('@deleted.invalid'),
+  { message: 'This email domain is reserved' }
+)
+
 const baseUserSchema = z.object({
-  email: z.string().email({ message: 'Invalid email' }),
+  email: userEmailSchema,
   name: z.string().min(1, { message: 'Name is required' }),
   lastname: z.string().min(1, { message: 'Lastname is required' }),
   avatar: z.string().optional(),

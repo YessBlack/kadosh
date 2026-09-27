@@ -1,18 +1,15 @@
 import 'dotenv/config'
 import { createApp } from './app'
 import { createAuthRouter } from '@/routes/user/auth.routes'
+import { authController } from '@/container/auth.dependencies'
 import { createUserRouter } from '@/routes/user/user.routes'
-import { AuthModel } from './models/user/auth.model'
-import { UserModel } from '@/models/user/user.model'
+import { userController } from '@/container/user.dependencies'
 
 const PORT = process.env.PORT ?? 3001
 
-const authModel = new AuthModel()
-const userModel = new UserModel()
-
 const app = createApp(
-  { path: '/api/auth', router: createAuthRouter({ authModel }) },
-  { path: '/api/users', router: createUserRouter({ userModel }) }
+  { path: '/api/auth', router: createAuthRouter({ authController }) },
+  { path: '/api/users', router: createUserRouter({ userController }) }
 )
 
 app.listen(PORT, () => {

@@ -1,93 +1,104 @@
-import { Request, Response } from 'express'
-import { IUserModel } from '@/types/user/user.type'
-import { validateCreateUser, validateUpdateUser } from '@/schemas/user/user.schema'
+import { NextFunction, Request, Response } from 'express'
+import path from 'node:path'
+import { createUserSchema, updateUserSchema } from '@/schemas/user/user.schema'
+import { IUserService } from '@/types/user/user/user.service.type'
+import { sendValidationError } from '@/utils/validation.utils'
 
 interface UserControllerDeps {
-  userModel: IUserModel
+  userService: IUserService
 }
 
 export class UserController {
-  private userModel: IUserModel
+  private readonly userService: IUserService
 
-  constructor ({ userModel }: UserControllerDeps) {
-    this.userModel = userModel
+  constructor ({ userService }: UserControllerDeps) {
+    this.userService = userService
   }
 
-  getAll = async (req: Request, res: Response) => {
+  getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const users = await this.userModel.getAll()
+      const users = await this.userService.getAll()
       res.status(200).json(users)
-    } catch (error) {
-      res.status(500).json({ error: 'Error fetching users' })
+    } catch (error: unknown) {
+      next(error)
     }
   }
 
-  getById = async (req: Request<{ id: string }>, res: Response) => {
-    const { id } = req.params
+  getById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = await this.userModel.getById(id)
+      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id
+      const user = await this.userService.getById(id)
       res.status(200).json(user)
-    } catch (error) {
-      if (error instanceof Error && error.message === 'User not found') {
-        res.status(404).json({ error: error.message })
+    } catch (error: unknown) {
+      next(error)
+    }
+  }
+
+  getAvatar = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id
+      const user = await this.userService.getById(id)
+
+      if (!user.avatar) {
+        res.status(404).json({ message: 'Avatar not found' })
         return
       }
-      res.status(500).json({ error: 'Error fetching user' })
+
+      res.redirect(user.avatar)
+    } catch (error: unknown) {
+      next(error)
     }
   }
 
-  create = async (req: Request, res: Response) => {
-    const result = validateCreateUser(req.body)
-
-    if (!result.success) {
-      res.status(400).json({ error: result.error.issues })
-      return
-    }
+  create = async (req: Request, res: Response, next: NextFunction) => {
+    const result = createUserSchema.safeParse(req.body)
+    if (!result.success) return sendValidationError(res, result.error)
 
     try {
-      const user = await this.userModel.create(result.data)
+      const user = await this.userService.create(result.data)
       res.status(201).json(user)
-    } catch (error) {
-      if (error instanceof Error && error.message === 'User already exists') {
-        res.status(409).json({ error: error.message })
-        return
-      }
-      res.status(500).json({ error: 'Error creating user' })
+    } catch (error: unknown) {
+      next(error)
     }
   }
 
-  update = async (req: Request<{ id: string }>, res: Response) => {
-    const { id } = req.params
-    const result = validateUpdateUser(req.body)
+  update = async (req: Request, res: Response, next: NextFunction) => {
+    const result = updateUserSchema.safeParse(req.body)
+    if (!result.success) return sendValidationError(res, result.error)
 
-    if (!result.success) {
-      res.status(400).json({ error: result.error.issues })
+    try {
+      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id
+      const user = await this.userService.update(id, result.data)
+      res.status(200).json(user)
+    } catch (error: unknown) {
+      next(error)
+    }
+  }
+
+  updateAvatar = async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.file) {
+      res.status(400).json({ message: 'No file provided' })
       return
     }
 
     try {
-      const user = await this.userModel.update(id, result.data)
+      const file = new Blob([new Uint8Array(req.file.buffer)], { type: req.file.mimetype })
+      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id
+      const fileName = path.basename(req.file.originalname) || 'avatar'
+      const user = await this.userService.updateAvatar(id, file, fileName)
       res.status(200).json(user)
-    } catch (error) {
-      if (error instanceof Error && error.message === 'User not found') {
-        res.status(404).json({ error: error.message })
-        return
-      }
-      res.status(500).json({ error: 'Error updating user' })
+    } catch (error: unknown) {
+      next(error)
     }
   }
 
-  delete = async (req: Request<{ id: string }>, res: Response) => {
-    const { id } = req.params
+  delete = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      await this.userModel.delete(id)
-      res.status(204).send()
-    } catch (error) {
-      if (error instanceof Error && error.message === 'User not found') {
-        res.status(404).json({ error: error.message })
-        return
-      }
-      res.status(500).json({ error: 'Error deleting user' })
+      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id
+      await this.userService.delete(id)
+      res.status(200).json({ message: 'User deleted successfully' })
+    } catch (error: unknown) {
+      next(error)
     }
   }
 }

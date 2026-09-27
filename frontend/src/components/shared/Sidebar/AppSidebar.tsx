@@ -1,6 +1,8 @@
 import { mainItems, settingsItems } from '@/components/shared/Sidebar/sidebar.config'
+import { UserAvatar } from '@/components/shared/User/UserAvatar'
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenu } from '@/components/ui/dropdown-menu'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
+import type { Role } from '@/features/roles/roles'
 import { useAuthStore } from '@/store/auth.store'
 import { ChevronsUpDown } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -8,10 +10,12 @@ import { Link } from 'react-router-dom'
 export const AppSidebar = () => {
   const { toggleSidebar } = useSidebar()
   const { logout, user } = useAuthStore()
+  const mainItemsForRole = mainItems.filter(item => item.roles.includes(user?.role as Role))
+  const settingsItemsForRole = settingsItems.filter(item => item.roles.includes(user?.role as Role))
 
   return (
-    <Sidebar side='left' variant='floating' collapsible='icon'>
-      <div className='relative flex h-full flex-col overflow-hidden rounded-[inherit]'>
+    <Sidebar side='left' variant='sidebar' collapsible='icon'>
+      <div className='relative flex h-full flex-col overflow-hidden'>
         <div className='pointer-events-none absolute inset-0'>
           <div className='absolute inset-0 bg-[radial-gradient(circle_at_8%_12%,rgba(124,58,237,0.18),transparent_30%),radial-gradient(circle_at_78%_0%,rgba(167,139,250,0.18),transparent_36%),radial-gradient(circle_at_50%_100%,rgba(124,58,237,0.12),transparent_38%)] dark:bg-[radial-gradient(circle_at_8%_12%,rgba(124,58,237,0.2),transparent_30%),radial-gradient(circle_at_78%_0%,rgba(167,139,250,0.2),transparent_36%),radial-gradient(circle_at_50%_100%,rgba(124,58,237,0.14),transparent_38%)]' />
           <div className='absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0)_42%,rgba(255,255,255,0.18)_72%,rgba(255,255,255,0)_100%)] mix-blend-soft-light dark:bg-[linear-gradient(115deg,rgba(30,27,75,0.34)_0%,rgba(30,27,75,0.12)_42%,rgba(91,33,182,0.22)_72%,rgba(30,27,75,0.08)_100%)]' />
@@ -39,10 +43,10 @@ export const AppSidebar = () => {
         </SidebarHeader>
 
         <SidebarContent className='relative z-10'>
-          {mainItems.length > 0 && (
+          {mainItemsForRole.length > 0 && (
             <SidebarGroup>
               <SidebarMenu>
-                {mainItems.map((item) => (
+                {mainItemsForRole.map((item) => (
                   <SidebarMenuItem key={item.path}>
                     <Link to={item.path}>
                       <SidebarMenuButton tooltip={item.label}>
@@ -56,11 +60,11 @@ export const AppSidebar = () => {
             </SidebarGroup>
           )}
 
-          {settingsItems.length > 0 && (
+          {settingsItemsForRole.length > 0 && (
             <SidebarGroup>
               <SidebarGroupLabel>Configuración</SidebarGroupLabel>
               <SidebarMenu>
-                {settingsItems.map((item) => (
+                {settingsItemsForRole.map((item) => (
                   <SidebarMenuItem key={item.path}>
                     <Link to={item.path}>
                       <SidebarMenuButton tooltip={item.label}>
@@ -84,13 +88,14 @@ export const AppSidebar = () => {
                     size='lg'
                     className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
                   >
-                    <img
-                      src={user?.avatar || 'https://github.com/shadcn.png'}
-                      alt='shadcn'
-                      className='size-8 rounded-full object-cover'
+                    <UserAvatar
+                      imageUrl={user?.avatar}
+                      name={user?.name}
+                      lastname={user?.lastname}
+                      className={user?.avatar ? 'w-10 h-10' : ''}
                     />
                     <div className='grid flex-1 text-left text-sm leading-tight'>
-                      <span className='truncate font-semibold'>{user?.name}</span>
+                      <span className='truncate font-semibold'>{`${user?.name} ${user?.lastname}`}</span>
                       <span className='truncate text-xs text-muted-foreground'>{user?.email}</span>
                     </div>
                     <ChevronsUpDown className='size-4 shrink-0 opacity-50' />
@@ -98,14 +103,14 @@ export const AppSidebar = () => {
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent side='top' align='start' className='w-56'>
-                  <DropdownMenuItem><Link to='/perfil'>Mi Perfil</Link></DropdownMenuItem>
+                  <Link to='/perfil'><DropdownMenuItem>Mi Perfil</DropdownMenuItem></Link>
                   <DropdownMenuItem onClick={logout}>Cerrar Sesión</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
-      </div>
-    </Sidebar>
+      </div >
+    </Sidebar >
   )
 }

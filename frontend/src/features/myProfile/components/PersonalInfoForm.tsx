@@ -41,16 +41,16 @@ export const PersonalInfoForm = () => {
     }
 
     setIsSubmitting(true)
-    const response = await userApi.updateUser(user?.id, userData)
-
-    if (response) {
+    try {
+      const response = await userApi.updateUser(user.id, userData)
       setUser({ ...user, ...response })
+      showToast.success('Exito', 'Información Actualizada')
+    } catch (error: unknown) {
+      const message = (error as { response?: { data?: { message?: unknown } } })?.response?.data?.message
+      showToast.error('Error', typeof message === 'string' ? message : 'Ocurrio un error al actualizar la información')
+    } finally {
       setIsSubmitting(false)
-      return showToast.success('Exito', 'Información Actualizada')
     }
-
-    setIsSubmitting(false)
-    showToast.error('Error', 'Ocurrio un error al actualizar la información')
   }
 
   return (

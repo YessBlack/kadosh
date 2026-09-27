@@ -1,6 +1,7 @@
 import { UploadPicture } from '@/components/shared/UploadPicture'
 import { Badge } from '@/components/ui/badge'
 import { profileApi } from '@/features/myProfile/api/profile.api'
+import { ROLES } from '@/features/roles/roles'
 import { useAuthStore } from '@/store/auth.store'
 import { formatDate } from '@/utils/dateUtils'
 import { showToast } from '@/utils/toast.utils'
@@ -36,16 +37,16 @@ export const ProfileCard = () => {
     }
 
     setIsUploading(true)
-    const response = await profileApi.updateUserAvatar(user?.id, image)
-
-    if (response) {
+    try {
+      const response = await profileApi.updateUserAvatar(user.id, image)
       setUser({ ...user, ...response })
+      showToast.success('Exito', 'Foto de Perfil Actualizada')
+    } catch (error: unknown) {
+      const message = (error as { response?: { data?: { message?: unknown } } })?.response?.data?.message
+      showToast.error('Error', typeof message === 'string' ? message : 'Ocurrio un error al actualizar la foto de perfil')
+    } finally {
       setIsUploading(false)
-      return showToast.success('Exito', 'Foto de Perfil Actualizada')
     }
-
-    setIsUploading(false)
-    return showToast.error('Error', 'Ocurrio un error al actualizar la foto de perfil')
   }
 
   return (
@@ -76,7 +77,7 @@ export const ProfileCard = () => {
 
         <div className='flex gap-2'>
           <Badge className='rounded-full bg-violet-100 text-violet-800 hover:bg-violet-100 dark:bg-violet-900/40 dark:text-violet-300'>
-            Administrador
+            {user?.role === ROLES.ADMIN ? 'Administrador' : user?.role === ROLES.VENDEDOR ? 'Vendedor' : 'Inventario'}
           </Badge>
           <Badge
             variant={user?.isActive ? 'success' : 'destructive'}

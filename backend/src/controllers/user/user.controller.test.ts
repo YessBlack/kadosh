@@ -1,8 +1,12 @@
 import request from 'supertest'
 import { createApp } from '@/app'
+import { UserController } from '@/controllers/user/user.controller'
+import { createAuthMiddleware } from '@/middlewares/auth.middleware'
 import { createUserRouter } from '@/routes/user/user.routes'
+import { ROLES } from '@/types/user/role.type'
+import { AppError } from '@/utils/app-error'
 
-const mockUserModel = {
+const userService = {
   getAll: jest.fn(),
   getById: jest.fn(),
   create: jest.fn(),
@@ -11,194 +15,237 @@ const mockUserModel = {
   delete: jest.fn()
 }
 
-const app = createApp(
-  { path: '/api/users', router: createUserRouter({ userModel: mockUserModel }) }
-)
+const authService = {
+  login: jest.fn(),
+  me: jest.fn(),
+  changePassword: jest.fn()
+}
+
+const mockUser = {
+  id: '1',
+  email: 'test@test.com',
+  name: 'John',
+  lastname: 'Doe',
+  isActive: true,
+  role: ROLES.VENDEDOR
+}
+
+const adminUser = {
+  ...mockUser,
+  role: ROLES.ADMIN
+}
+
+const app = createApp({
+  path: '/api/users',
+  router: createUserRouter({
+    userController: new UserController({ userService }),
+    authMiddleware: createAuthMiddleware(authService)
+  })
+})
 
 describe('UserController', () => {
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => {
+    jest.clearAllMocks()
+    authService.me.mockResolvedValue({ token: 'refreshed-token', user: adminUser })
+  })
 
-  describe('GET /api/users/:id', () => {
-    it('should return 200 with the user', async () => {
-      const mockUser = { id: '1', email: 'test@test.com', name: 'John', lastname: 'Doe' }
-      mockUserModel.getById.mockResolvedValue(mockUser)
+  it('rejects requests without an authenticated session', async () => {
+    const response = await request(app).get('/api/users/1')
 
-      const res = await request(app).get('/api/users/1')
-      expect(res.status).toBe(200)
-      expect(res.body).toEqual(mockUser)
+    expect(response.status).toBe(401)
+    expect(authService.me).not.toHaveBeenCalled()
+    expect(userService.getById).not.toHaveBeenCalled()
+  })
+
+  it('denies user management to non-admin roles', async () => {
+    authService.me.mockResolvedValue({ token: 'refreshed-token', user: mockUser })
+
+    const response = await request(app)
+      .get('/api/users')
+      .set('Cookie', 'token=session-token')
+
+    expect(response.status).toBe(403)
+    expect(userService.getAll).not.toHaveBeenCalled()
+  })
+
+  it('denies users with an unknown role', async () => {
+    authService.me.mockResolvedValue({
+      token: 'refreshed-token',
+      user: { ...adminUser, role: 'unknown' }
     })
 
-    it('should return 404 if user does not exist', async () => {
-      mockUserModel.getById.mockRejectedValue(new Error('User not found'))
+    const response = await request(app)
+      .get('/api/users')
+      .set('Cookie', 'token=session-token')
 
-      const res = await request(app).get('/api/users/999')
-      expect(res.status).toBe(404)
+    expect(response.status).toBe(403)
+    expect(userService.getAll).not.toHaveBeenCalled()
+  })
+
+  it('denies inactive accounts before role authorization', async () => {
+    authService.me.mockResolvedValue({
+      token: 'refreshed-token',
+      user: { ...adminUser, isActive: false }
+    })
+
+    const response = await request(app)
+      .get('/api/users')
+      .set('Cookie', 'token=session-token')
+
+    expect(response.status).toBe(403)
+    expect(userService.getAll).not.toHaveBeenCalled()
+  })
+
+  it('returns a user by id', async () => {
+    userService.getById.mockResolvedValue(mockUser)
+
+    const response = await request(app)
+      .get('/api/users/1')
+      .set('Cookie', 'token=session-token')
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual(mockUser)
+    expect(userService.getById).toHaveBeenCalledWith('1')
+  })
+
+  it('maps a missing user to 404', async () => {
+    userService.getById.mockRejectedValue(new AppError('USER_NOT_FOUND', 'User not found'))
+
+    const response = await request(app)
+      .get('/api/users/unknown')
+      .set('Cookie', 'token=session-token')
+
+    expect(response.status).toBe(404)
+    expect(response.body).toEqual({ message: 'User not found' })
+  })
+
+  it('allows a user to update their own profile fields', async () => {
+    authService.me.mockResolvedValue({ token: 'refreshed-token', user: mockUser })
+    userService.update.mockResolvedValue({ ...mockUser, name: 'Jane' })
+
+    const response = await request(app)
+      .patch('/api/users/1')
+      .set('Cookie', 'token=session-token')
+      .send({ name: 'Jane', lastname: 'Doe', phone: '+14155552671' })
+
+    expect(response.status).toBe(200)
+    expect(userService.update).toHaveBeenCalledWith('1', {
+      name: 'Jane',
+      lastname: 'Doe',
+      phone: '+14155552671'
     })
   })
 
-  describe('POST /api/users', () => {
-    it('should return 201 with the created user', async () => {
-      const newUser = {
-        email: 'test@test.com',
-        password: 'password123',
-        passwordConfirm: 'password123',
-        name: 'John',
-        lastname: 'Doe'
-      }
+  it('prevents a user from changing their own role', async () => {
+    authService.me.mockResolvedValue({ token: 'refreshed-token', user: mockUser })
 
-      const createdUser = {
-        id: '1',
-        email: newUser.email,
-        name: newUser.name,
-        lastname: newUser.lastname,
-        avatar: ''
-      }
+    const response = await request(app)
+      .patch('/api/users/1')
+      .set('Cookie', 'token=session-token')
+      .send({ role: ROLES.ADMIN })
 
-      mockUserModel.create.mockResolvedValue(createdUser)
-
-      const res = await request(app).post('/api/users').send(newUser)
-      expect(res.status).toBe(201)
-      expect(res.body).toEqual(createdUser)
-    })
-
-    it('should return 400 for invalid input', async () => {
-      const res = await request(app).post('/api/users').send({ email: 'notanemail' })
-      expect(res.status).toBe(400)
-    })
-
-    it('should return 409 if user already exists', async () => {
-      mockUserModel.create.mockRejectedValue(new Error('User already exists'))
-
-      const res = await request(app)
-        .post('/api/users')
-        .send({ email: 'test@test.com', password: 'password123', passwordConfirm: 'password123', name: 'John', lastname: 'Doe' })
-      expect(res.status).toBe(409)
-    })
-
-    it('should return 500 for server error', async () => {
-      mockUserModel.create.mockRejectedValue(new Error('Server error'))
-
-      const res = await request(app)
-        .post('/api/users')
-        .send({ email: 'test@test.com', password: 'password123', passwordConfirm: 'password123', name: 'John', lastname: 'Doe' })
-      expect(res.status).toBe(500)
-    })
+    expect(response.status).toBe(403)
+    expect(userService.update).not.toHaveBeenCalled()
   })
 
-  describe('PATCH /api/users/:id', () => {
-    it('should return 200 with the updated user', async () => {
-      const updatedUser = { id: '1', email: 'test@test.com', name: 'John', lastname: 'Doe' }
-      mockUserModel.update.mockResolvedValue(updatedUser)
+  it('prevents a user from editing another user profile', async () => {
+    authService.me.mockResolvedValue({ token: 'refreshed-token', user: mockUser })
 
-      const res = await request(app)
-        .patch('/api/users/1')
-        .send({ name: 'John', lastname: 'Doe' })
-      expect(res.status).toBe(200)
-      expect(res.body).toEqual(updatedUser)
-    })
+    const response = await request(app)
+      .patch('/api/users/other-user')
+      .set('Cookie', 'token=session-token')
+      .send({ name: 'Jane' })
 
-    it('should return 400 for invalid input', async () => {
-      const res = await request(app)
-        .patch('/api/users/1')
-        .send({ name: '' })
-      expect(res.status).toBe(400)
-    })
-
-    it('should return 404 if user does not exist', async () => {
-      mockUserModel.update.mockRejectedValue(new Error('User not found'))
-
-      const res = await request(app)
-        .patch('/api/users/999')
-        .send({ name: 'John', lastname: 'Doe' })
-      expect(res.status).toBe(404)
-    })
-
-    it('should return 500 for server error', async () => {
-      mockUserModel.update.mockRejectedValue(new Error('Server error'))
-
-      const res = await request(app)
-        .patch('/api/users/1')
-        .send({ name: 'John', lastname: 'Doe' })
-      expect(res.status).toBe(500)
-    })
+    expect(response.status).toBe(403)
+    expect(userService.update).not.toHaveBeenCalled()
   })
 
-  describe('PATCH /api/users/:id/avatar', () => {
-    it('should return 200 with updated user', async () => {
-      const mockUser = {
-        id: '1',
-        email: 'test@test.com',
-        name: 'Test',
-        lastname: 'User',
-        avatar: 'http://pocketbase.io/files/users/1/foto.jpg',
-        isActive: true,
-        isDeleted: false,
-        createdAt: '2026-01-01',
-        updatedAt: '2026-01-01',
-        createdBy: 'admin',
-        lastLogin: '2026-01-01'
-      }
-      mockUserModel.updateAvatar.mockResolvedValue(mockUser)
+  it('redirects an authenticated user to their stored avatar file', async () => {
+    const avatarUrl = 'http://127.0.0.1:8090/api/files/users/1/avatar.jpg'
+    authService.me.mockResolvedValue({ token: 'refreshed-token', user: mockUser })
+    userService.getById.mockResolvedValue({ ...mockUser, avatar: avatarUrl })
 
-      const res = await request(app)
-        .patch('/api/users/1/avatar')
-        .attach('avatar', Buffer.from('fake-image'), 'foto.jpg')
+    const response = await request(app)
+      .get('/api/users/1/avatar')
+      .set('Cookie', 'token=session-token')
 
-      expect(res.status).toBe(200)
-      expect(res.body).toEqual(mockUser)
-    })
-
-    it('should return 404 if user not found', async () => {
-      mockUserModel.updateAvatar.mockRejectedValue(new Error('User not found'))
-
-      const res = await request(app)
-        .patch('/api/users/1/avatar')
-        .attach('avatar', Buffer.from('fake-image'), 'foto.jpg')
-
-      expect(res.status).toBe(404)
-      expect(res.body).toEqual({ error: { message: 'User not found' } })
-    })
-
-    it('should return 500 on server error', async () => {
-      mockUserModel.updateAvatar.mockRejectedValue(new Error('Server error'))
-
-      const res = await request(app)
-        .patch('/api/users/1/avatar')
-        .attach('avatar', Buffer.from('fake-image'), 'foto.jpg')
-
-      expect(res.status).toBe(500)
-      expect(res.body).toEqual({ error: { message: 'Error updating user' } })
-    })
-
-    it('should return 400 if no file provided', async () => {
-      const res = await request(app)
-        .patch('/api/users/1/avatar')
-
-      expect(res.status).toBe(400)
-      expect(res.body).toEqual({ error: { message: 'No file provided' } })
-    })
+    expect(response.status).toBe(302)
+    expect(response.headers.location).toBe(avatarUrl)
   })
 
-  describe('DELETE /api/users/:id', () => {
-    it('should return 204 on successful deletion', async () => {
-      mockUserModel.delete.mockResolvedValue(undefined)
+  it('does not expose another user avatar to non-admins', async () => {
+    authService.me.mockResolvedValue({ token: 'refreshed-token', user: mockUser })
 
-      const res = await request(app).delete('/api/users/1')
-      expect(res.status).toBe(204)
-    })
+    const response = await request(app)
+      .get('/api/users/other-user/avatar')
+      .set('Cookie', 'token=session-token')
 
-    it('should return 404 if user does not exist', async () => {
-      mockUserModel.delete.mockRejectedValue(new Error('User not found'))
+    expect(response.status).toBe(403)
+    expect(userService.getById).not.toHaveBeenCalled()
+  })
 
-      const res = await request(app).delete('/api/users/999')
-      expect(res.status).toBe(404)
-    })
+  it('rejects invalid user input without calling the service', async () => {
+    const response = await request(app)
+      .post('/api/users')
+      .set('Cookie', 'token=session-token')
+      .send({ email: 'not-an-email' })
 
-    it('should return 500 for server error', async () => {
-      mockUserModel.delete.mockRejectedValue(new Error('Server error'))
+    expect(response.status).toBe(400)
+    expect(userService.create).not.toHaveBeenCalled()
+  })
 
-      const res = await request(app).delete('/api/users/1')
-      expect(res.status).toBe(500)
-    })
+  it('creates a user with the schema defaults applied', async () => {
+    const input = {
+      email: 'test@test.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+      name: 'John',
+      lastname: 'Doe',
+      role: ROLES.VENDEDOR
+    }
+    userService.create.mockResolvedValue(mockUser)
+
+    const response = await request(app)
+      .post('/api/users')
+      .set('Cookie', 'token=session-token')
+      .send(input)
+
+    expect(response.status).toBe(201)
+    expect(response.body).toEqual(mockUser)
+    expect(userService.create).toHaveBeenCalledWith({ ...input, isActive: true })
+  })
+
+  it('requires a file for avatar updates', async () => {
+    const response = await request(app)
+      .patch('/api/users/1/avatar')
+      .set('Cookie', 'token=session-token')
+
+    expect(response.status).toBe(400)
+    expect(userService.updateAvatar).not.toHaveBeenCalled()
+  })
+
+  it('allows a user to update their own avatar', async () => {
+    authService.me.mockResolvedValue({ token: 'refreshed-token', user: mockUser })
+    userService.updateAvatar.mockResolvedValue(mockUser)
+
+    const response = await request(app)
+      .patch('/api/users/1/avatar')
+      .set('Cookie', 'token=session-token')
+      .attach('avatar', Buffer.from('avatar'), 'avatar.png')
+
+    expect(response.status).toBe(200)
+    expect(userService.updateAvatar).toHaveBeenCalledWith('1', expect.any(Blob), 'avatar.png')
+  })
+
+  it('soft-deletes a user through the service', async () => {
+    userService.delete.mockResolvedValue(undefined)
+
+    const response = await request(app)
+      .delete('/api/users/1')
+      .set('Cookie', 'token=session-token')
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({ message: 'User deleted successfully' })
+    expect(userService.delete).toHaveBeenCalledWith('1')
   })
 })

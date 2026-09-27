@@ -1,22 +1,27 @@
+// routes/user/user.routes.ts
+import { Router, RequestHandler } from 'express'
 import { UserController } from '@/controllers/user/user.controller'
 import { uploadSingle } from '@/middlewares/upload'
-import { IUserModel } from '@/types/user/user.type'
-import { Router } from 'express'
+import { requireRole, requireSelfOrRole } from '@/middlewares/role.middleware'
+import { ROLES } from '@/types/user/role.type'
 
-interface UserRoutesDeps {
-  userModel: IUserModel
+interface UserRouterDeps {
+  userController: UserController
+  authMiddleware: RequestHandler
 }
 
-export const createUserRouter = ({ userModel }: UserRoutesDeps) => {
-  const userRouter = Router()
-  const userController = new UserController({ userModel })
+export const createUserRouter = ({ userController, authMiddleware }: UserRouterDeps): Router => {
+  const router = Router()
 
-  userRouter.get('/', userController.getAll)
-  userRouter.get('/:id', userController.getById)
-  userRouter.post('/', userController.create)
-  userRouter.patch('/:id', userController.update)
-  userRouter.delete('/:id', userController.delete)
-  userRouter.patch('/:id/avatar', uploadSingle('avatar'), userController.updateAvatar)
+  router.use(authMiddleware)
 
-  return userRouter
+  router.get('/', requireRole(ROLES.ADMIN), userController.getAll)
+  router.get('/:id', requireRole(ROLES.ADMIN), userController.getById)
+  router.get('/:id/avatar', requireSelfOrRole(ROLES.ADMIN), userController.getAvatar)
+  router.post('/', requireRole(ROLES.ADMIN), userController.create)
+  router.patch('/:id', requireSelfOrRole(ROLES.ADMIN, ['name', 'lastname', 'phone']), userController.update)
+  router.delete('/:id', requireRole(ROLES.ADMIN), userController.delete)
+  router.patch('/:id/avatar', requireSelfOrRole(ROLES.ADMIN), uploadSingle('avatar'), userController.updateAvatar)
+
+  return router
 }

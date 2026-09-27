@@ -2,6 +2,7 @@ import { mainItems, settingsItems } from '@/components/shared/Sidebar/sidebar.co
 import { UserAvatar } from '@/components/shared/User/UserAvatar'
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenu } from '@/components/ui/dropdown-menu'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
+import type { Role } from '@/features/roles/roles'
 import { useAuthStore } from '@/store/auth.store'
 import { ChevronsUpDown } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -9,6 +10,8 @@ import { Link } from 'react-router-dom'
 export const AppSidebar = () => {
   const { toggleSidebar } = useSidebar()
   const { logout, user } = useAuthStore()
+  const mainItemsForRole = mainItems.filter(item => item.roles.includes(user?.role as Role))
+  const settingsItemsForRole = settingsItems.filter(item => item.roles.includes(user?.role as Role))
 
   return (
     <Sidebar side='left' variant='sidebar' collapsible='icon'>
@@ -40,10 +43,10 @@ export const AppSidebar = () => {
         </SidebarHeader>
 
         <SidebarContent className='relative z-10'>
-          {mainItems.length > 0 && (
+          {mainItemsForRole.length > 0 && (
             <SidebarGroup>
               <SidebarMenu>
-                {mainItems.map((item) => (
+                {mainItemsForRole.map((item) => (
                   <SidebarMenuItem key={item.path}>
                     <Link to={item.path}>
                       <SidebarMenuButton tooltip={item.label}>
@@ -57,11 +60,11 @@ export const AppSidebar = () => {
             </SidebarGroup>
           )}
 
-          {settingsItems.length > 0 && (
+          {settingsItemsForRole.length > 0 && (
             <SidebarGroup>
               <SidebarGroupLabel>Configuración</SidebarGroupLabel>
               <SidebarMenu>
-                {settingsItems.map((item) => (
+                {settingsItemsForRole.map((item) => (
                   <SidebarMenuItem key={item.path}>
                     <Link to={item.path}>
                       <SidebarMenuButton tooltip={item.label}>

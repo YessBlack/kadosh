@@ -1,4 +1,4 @@
-import { User } from '@/types/user/user.type'
+import { User } from '@/types/user/user/user.type'
 
 export type AuthUserUpdate = {
   lastLogin?: string

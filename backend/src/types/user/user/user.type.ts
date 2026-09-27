@@ -1,4 +1,5 @@
 import { createUserSchema, updateUserSchema } from '@/schemas/user/user.schema'
+import { Role } from '@/types/user/permissions/role.type'
 import { z } from 'zod'
 
 export type User = {
@@ -14,6 +15,7 @@ export type User = {
   isDeleted: boolean
   phone?: string
   lastLogin?: string
+  role: Role
 }
 
 // request DTO

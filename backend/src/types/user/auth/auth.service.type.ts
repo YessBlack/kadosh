@@ -1,4 +1,4 @@
-import { AuthResponse, ChangePasswordInput, LoginInput } from '@/types/user/auth.type'
+import { AuthResponse, ChangePasswordInput, LoginInput } from '@/types/user/auth/auth.type'
 
 export interface IAuthService {
   login: (input: LoginInput) => Promise<AuthResponse>

@@ -1,5 +1,5 @@
 import { changePasswordSchema, loginSchema } from '@/schemas/user/auth.schema'
-import { User } from '@/types/user/user.type'
+import { User } from '@/types/user/user/user.type'
 import { z } from 'zod'
 
 // request DTO

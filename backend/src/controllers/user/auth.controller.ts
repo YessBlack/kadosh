@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { validateChangePassword, validateLogin } from '@/schemas/user/auth.schema'
-import { IAuthService } from '@/types/user/auth.service.type'
+import { IAuthService } from '@/types/user/auth/auth.service.type'
 import { sendValidationError } from '@/utils/validation.utils'
 
 interface AuthControllerDeps {

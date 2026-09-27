@@ -1,6 +1,7 @@
-import { IAuthRepository } from '@/types/user/auth.repository.type'
-import { IAuthService } from '@/types/user/auth.service.type'
-import { AuthResponse, ChangePasswordInput, LoginInput } from '@/types/user/auth.type'
+import { IAuthRepository } from '@/types/user/auth/auth.repository.type'
+import { IAuthService } from '@/types/user/auth/auth.service.type'
+import { AuthResponse, ChangePasswordInput, LoginInput } from '@/types/user/auth/auth.type'
+import { User } from '@/types/user/user/user.type'
 import { AppError } from '@/utils/app-error'
 
 export class AuthService implements IAuthService {
@@ -13,18 +14,22 @@ export class AuthService implements IAuthService {
   async login ({ email, password }: LoginInput): Promise<AuthResponse> {
     const session = this.repo.createSession()
     const result = await session.authWithPassword(email, password)
+    this.assertActiveUser(result.user)
     const user = await session.updateUser(result.user.id, { lastLogin: new Date().toISOString() })
 
     return { token: result.token, user }
   }
 
   async me (token: string): Promise<AuthResponse> {
-    return this.repo.createSession().authRefresh(token)
+    const response = await this.repo.createSession().authRefresh(token)
+    this.assertActiveUser(response.user)
+    return response
   }
 
   async changePassword (token: string, { currentPassword, newPassword }: ChangePasswordInput): Promise<void> {
     const session = this.repo.createSession()
     const { user } = await session.authRefresh(token)
+    this.assertActiveUser(user)
 
     try {
       await session.authWithPassword(user.email, currentPassword)
@@ -40,5 +45,11 @@ export class AuthService implements IAuthService {
       passwordConfirm: newPassword,
       oldPassword: currentPassword
     })
+  }
+
+  private assertActiveUser (user: User): void {
+    if (!user.isActive) {
+      throw new AppError('ACCOUNT_INACTIVE', 'Account is inactive')
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { User, CreateUserInput, UpdateUserInput } from '@/types/user/user.type'
+import { User, CreateUserInput, UpdateUserInput } from '@/types/user/user/user.type'
 
 export interface IUserService {
   getAll: () => Promise<User[]>

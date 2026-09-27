@@ -1,6 +1,6 @@
-import { IUserRepository } from '@/types/user/user.repository.type'
-import { IUserService } from '@/types/user/user.service.type'
-import { User, CreateUserInput, UpdateUserInput } from '@/types/user/user.type'
+import { IUserRepository } from '@/types/user/user/user.repository.type'
+import { IUserService } from '@/types/user/user/user.service.type'
+import { User, CreateUserInput, UpdateUserInput } from '@/types/user/user/user.type'
 import { AppError } from '@/utils/app-error'
 
 const MAX_AVATAR_SIZE = 2 * 1024 * 1024

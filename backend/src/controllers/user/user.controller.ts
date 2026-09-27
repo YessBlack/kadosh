@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { createUserSchema, updateUserSchema } from '@/schemas/user/user.schema'
-import { IUserService } from '@/types/user/user.service.type'
+import { IUserService } from '@/types/user/user/user.service.type'
 import { sendValidationError } from '@/utils/validation.utils'
 
 interface UserControllerDeps {

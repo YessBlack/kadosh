@@ -1,4 +1,4 @@
-import { CreateUserInput, UpdateUserInput, User } from '@/types/user/user.type'
+import { CreateUserInput, UpdateUserInput, User } from '@/types/user/user/user.type'
 
 export interface IUserRepository {
   findAll: () => Promise<User[]>

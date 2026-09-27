@@ -1,6 +1,6 @@
 import PocketBase, { RecordModel } from 'pocketbase'
-import { AuthUserUpdate, IAuthRepository, IAuthSession, AuthResult } from '@/types/user/auth.repository.type'
-import { User } from '@/types/user/user.type'
+import { AuthUserUpdate, IAuthRepository, IAuthSession, AuthResult } from '@/types/user/auth/auth.repository.type'
+import { User } from '@/types/user/user/user.type'
 import { isPocketBaseError } from '@/utils/pocketbase.error'
 import { AppError } from '@/utils/app-error'
 import { mapPocketBaseUser } from '@/repositories/user/user.mapper'
@@ -19,7 +19,11 @@ export class AuthRepository implements IAuthRepository {
 }
 
 class PocketBaseAuthSession implements IAuthSession {
-  constructor (private readonly client: PocketBase) {}
+  private readonly client: PocketBase
+
+  constructor (client: PocketBase) {
+    this.client = client
+  }
 
   async authWithPassword (email: string, password: string): Promise<AuthResult> {
     try {

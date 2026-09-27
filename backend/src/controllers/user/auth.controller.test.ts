@@ -2,6 +2,7 @@ import request from 'supertest'
 import { createApp } from '@/app'
 import { AuthController } from '@/controllers/user/auth.controller'
 import { createAuthRouter } from '@/routes/user/auth.routes'
+import { ROLES } from '@/types/user/permissions/role.type'
 import { AppError } from '@/utils/app-error'
 
 const authService = {
@@ -13,7 +14,9 @@ const authService = {
 const mockUser = {
   id: '123',
   email: 'test@test.com',
-  name: 'Test'
+  name: 'Test',
+  isActive: true,
+  role: ROLES.ADMIN
 }
 
 const app = createApp({
@@ -54,6 +57,17 @@ describe('AuthController', () => {
       .send({ email: 'test@test.com', password: 'password123' })
 
     expect(response.status).toBe(401)
+  })
+
+  it('denies login for inactive accounts', async () => {
+    authService.login.mockRejectedValue(new AppError('ACCOUNT_INACTIVE', 'Account is inactive'))
+
+    const response = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'test@test.com', password: 'password123' })
+
+    expect(response.status).toBe(403)
+    expect(response.headers['set-cookie']).toBeUndefined()
   })
 
   it('requires a cookie for the current-user endpoint', async () => {

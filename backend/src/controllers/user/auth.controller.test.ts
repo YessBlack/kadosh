@@ -2,7 +2,7 @@ import request from 'supertest'
 import { createApp } from '@/app'
 import { AuthController } from '@/controllers/user/auth.controller'
 import { createAuthRouter } from '@/routes/user/auth.routes'
-import { ROLES } from '@/types/user/permissions/role.type'
+import { ROLES } from '@/types/user/role.type'
 import { AppError } from '@/utils/app-error'
 
 const authService = {
@@ -26,6 +26,16 @@ const app = createApp({
 
 describe('AuthController', () => {
   beforeEach(() => jest.clearAllMocks())
+
+  it('allows the loopback alias for the local frontend origin', async () => {
+    const response = await request(app)
+      .options('/api/auth/login')
+      .set('Origin', 'http://127.0.0.1:5173')
+      .set('Access-Control-Request-Method', 'POST')
+
+    expect(response.status).toBe(204)
+    expect(response.headers['access-control-allow-origin']).toBe('http://127.0.0.1:5173')
+  })
 
   it('returns the user and an HttpOnly cookie after login', async () => {
     authService.login.mockResolvedValue({ token: 'fake-token', user: mockUser })

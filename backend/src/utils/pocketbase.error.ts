@@ -30,3 +30,17 @@ export const isPocketBaseEmailNotUniqueError = (error: unknown): boolean => {
 
   return emailError.code === 'validation_not_unique'
 }
+
+export const extractPocketBaseValidationMessage = (error: unknown): string | null => {
+  if (!isPocketBaseError(error) || error.status !== 400 || !isRecord(error.response)) {
+    return null
+  }
+
+  const data = error.response.data
+  if (!isRecord(data)) return null
+
+  const firstFieldError = Object.values(data).find(isRecord)
+  if (!firstFieldError || typeof firstFieldError.message !== 'string') return null
+
+  return firstFieldError.message
+}

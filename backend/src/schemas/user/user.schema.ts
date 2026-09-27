@@ -1,4 +1,4 @@
-import { ROLES } from '@/types/user/permissions/role.type'
+import { ROLES } from '@/types/user/role.type'
 import { z } from 'zod'
 
 const roleEnum = z.enum([ROLES.ADMIN, ROLES.VENDEDOR, ROLES.INVENTARIO])

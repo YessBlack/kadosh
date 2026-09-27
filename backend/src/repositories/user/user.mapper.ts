@@ -1,6 +1,6 @@
 import { RecordModel } from 'pocketbase'
 import { User } from '@/types/user/user/user.type'
-import { Role } from '@/types/user/permissions/role.type'
+import { Role } from '@/types/user/role.type'
 
 export const mapPocketBaseUser = (record: RecordModel, avatarUrl: string): User => ({
   id: record.id,

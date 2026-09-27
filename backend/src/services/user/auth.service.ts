@@ -15,7 +15,13 @@ export class AuthService implements IAuthService {
     const session = this.repo.createSession()
     const result = await session.authWithPassword(email, password)
     this.assertActiveUser(result.user)
-    const user = await session.updateUser(result.user.id, { lastLogin: new Date().toISOString() })
+
+    let user = result.user
+    try {
+      user = await session.updateUser(result.user.id, { lastLogin: new Date().toISOString() })
+    } catch (error: unknown) {
+      console.warn({ userId: result.user.id, error }, 'Could not update last login')
+    }
 
     return { token: result.token, user }
   }

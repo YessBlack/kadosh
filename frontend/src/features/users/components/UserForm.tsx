@@ -10,6 +10,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { ROLES, type Role } from '@/features/roles/roles'
 import { useUserForm } from '@/features/users/hooks/useUserForm'
 import type { User } from '@/features/users/types/auth.types'
 
@@ -25,6 +26,7 @@ export const UserForm = ({ selectedUser, onSuccess }: UserFormProps) => {
     isDeleting,
     isCompleted,
     handleChange,
+    setRole,
     handleSubmit,
     setIsDeleting,
     handleDelete,
@@ -38,7 +40,7 @@ export const UserForm = ({ selectedUser, onSuccess }: UserFormProps) => {
       <div className='mt-5'>
         <AppAlert
           title='¿Estás seguro?'
-          description='Esta acción no se puede deshacer. El usuario será eliminado permanentemente.'
+          description='Esta acción es irreversible: el usuario se eliminará por completo y no podrá recuperarse. Los reportes, ventas o movimientos ya registrados que lo referencian podrían mostrar datos incompletos o inconsistentes.'
           variant={ALERT_VARIANT.ERROR}
         />
         <div className='mt-4 flex justify-end gap-2'>
@@ -133,6 +135,20 @@ export const UserForm = ({ selectedUser, onSuccess }: UserFormProps) => {
               </Field>
             }
             {renderConfirmPassword()}
+            <Field className='flex flex-col gap-2'>
+              <Label htmlFor='user-role' required>Rol</Label>
+              <select
+                id='user-role'
+                aria-label='Rol'
+                className='h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus-visible:border-violet-500 focus-visible:ring-3 focus-visible:ring-violet-400/35 dark:border-[#1E1B4B] dark:bg-[#151b2C]/70 dark:text-[#E5E7EB]'
+                value={values.role}
+                onChange={event => setRole(event.target.value as Role)}
+              >
+                <option value={ROLES.ADMIN}>Administrador</option>
+                <option value={ROLES.VENDEDOR}>Vendedor</option>
+                <option value={ROLES.INVENTARIO}>Inventario</option>
+              </select>
+            </Field>
             <Field className='flex flex-col gap-1'>
               <Label required className='text-sm font-medium'>
                 Estado

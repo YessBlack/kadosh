@@ -1,6 +1,6 @@
 import PocketBase, { RecordModel } from 'pocketbase'
 import { IUserRepository } from '@/types/user/user/user.repository.type'
-import { isPocketBaseEmailNotUniqueError, isPocketBaseError } from '@/utils/pocketbase.error'
+import { extractPocketBaseValidationMessage, isPocketBaseEmailNotUniqueError, isPocketBaseError } from '@/utils/pocketbase.error'
 import { CreateUserInput, UpdateUserInput, User } from '@/types/user/user/user.type'
 import { AppError } from '@/utils/app-error'
 import { mapPocketBaseUser } from '@/repositories/user/user.mapper'
@@ -61,13 +61,17 @@ export class UserRepository implements IUserRepository {
       if (isPocketBaseError(error) && error.status === 404) {
         throw new AppError('USER_NOT_FOUND', 'User not found', error)
       }
+      const validationMessage = extractPocketBaseValidationMessage(error)
+      if (validationMessage) {
+        throw new AppError('VALIDATION_ERROR', validationMessage, error)
+      }
       throw error
     }
   }
 
-  async updateAvatar (id: string, file: Blob): Promise<User> {
+  async updateAvatar (id: string, file: Blob, fileName: string): Promise<User> {
     const formData = new FormData()
-    formData.append('avatar', file)
+    formData.append('avatar', file, fileName)
 
     try {
       const record = await this.pb.collection('users').update(id, formData)
@@ -76,29 +80,17 @@ export class UserRepository implements IUserRepository {
       if (isPocketBaseError(error) && error.status === 404) {
         throw new AppError('USER_NOT_FOUND', 'User not found', error)
       }
+      const validationMessage = extractPocketBaseValidationMessage(error)
+      if (validationMessage) {
+        throw new AppError('VALIDATION_ERROR', validationMessage, error)
+      }
       throw error
     }
   }
 
-  async softDelete (id: string): Promise<void> {
+  async delete (id: string): Promise<void> {
     try {
-      const collection = this.pb.collection('users')
-      const record = await collection.getOne(id)
-      const aliasPrefix = `deleted-${record.id}`
-      const emailLocalPart = record.email.split('@')[0]
-      const aliasSuffix = emailLocalPart.slice(aliasPrefix.length)
-      const matchesAliasPrefix = emailLocalPart === aliasPrefix || emailLocalPart.startsWith(`${aliasPrefix}-`)
-      const alreadyReleased = record.email.endsWith('@deleted.invalid') && matchesAliasPrefix &&
-        (aliasSuffix === '' || /^-\d+$/.test(aliasSuffix))
-
-      if (record.isDeleted && alreadyReleased) return
-
-      const releasedEmail = await this.findAvailableDeletedEmail(record.id)
-      await collection.update(id, {
-        email: releasedEmail,
-        deletedEmail: record.deletedEmail || record.email,
-        isDeleted: true
-      })
+      await this.pb.collection('users').delete(id)
     } catch (error: unknown) {
       if (isPocketBaseError(error) && error.status === 404) {
         throw new AppError('USER_NOT_FOUND', 'User not found', error)
@@ -117,18 +109,6 @@ export class UserRepository implements IUserRepository {
 
       throw error
     }
-  }
-
-  private async findAvailableDeletedEmail (recordId: string): Promise<string> {
-    for (let suffix = 0; suffix < 1000; suffix += 1) {
-      const localPart = suffix === 0 ? `deleted-${recordId}` : `deleted-${recordId}-${suffix}`
-      const candidate = `${localPart}@deleted.invalid`
-      const existingRecord = await this.findRecordByEmail(candidate)
-
-      if (!existingRecord || existingRecord.id === recordId) return candidate
-    }
-
-    throw new Error(`Unable to allocate a deleted email alias for user ${recordId}`)
   }
 
   private toUser (record: RecordModel): User {

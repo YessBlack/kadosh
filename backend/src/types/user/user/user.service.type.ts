@@ -5,6 +5,6 @@ export interface IUserService {
   getById: (id: string) => Promise<User>
   create: (input: CreateUserInput) => Promise<User>
   update: (id: string, input: UpdateUserInput) => Promise<User>
-  updateAvatar: (id: string, file: Blob) => Promise<User>
+  updateAvatar: (id: string, file: Blob, fileName: string) => Promise<User>
   delete: (id: string) => Promise<void>
 }

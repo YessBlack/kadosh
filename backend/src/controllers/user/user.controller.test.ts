@@ -3,7 +3,7 @@ import { createApp } from '@/app'
 import { UserController } from '@/controllers/user/user.controller'
 import { createAuthMiddleware } from '@/middlewares/auth.middleware'
 import { createUserRouter } from '@/routes/user/user.routes'
-import { ROLES } from '@/types/user/permissions/role.type'
+import { ROLES } from '@/types/user/role.type'
 import { AppError } from '@/utils/app-error'
 
 const userService = {
@@ -57,7 +57,7 @@ describe('UserController', () => {
     expect(userService.getById).not.toHaveBeenCalled()
   })
 
-  it('denies user reads to a role without users:read', async () => {
+  it('denies user management to non-admin roles', async () => {
     authService.me.mockResolvedValue({ token: 'refreshed-token', user: mockUser })
 
     const response = await request(app)
@@ -82,7 +82,7 @@ describe('UserController', () => {
     expect(userService.getAll).not.toHaveBeenCalled()
   })
 
-  it('denies inactive accounts before checking permissions', async () => {
+  it('denies inactive accounts before role authorization', async () => {
     authService.me.mockResolvedValue({
       token: 'refreshed-token',
       user: { ...adminUser, isActive: false }
@@ -117,6 +117,71 @@ describe('UserController', () => {
 
     expect(response.status).toBe(404)
     expect(response.body).toEqual({ message: 'User not found' })
+  })
+
+  it('allows a user to update their own profile fields', async () => {
+    authService.me.mockResolvedValue({ token: 'refreshed-token', user: mockUser })
+    userService.update.mockResolvedValue({ ...mockUser, name: 'Jane' })
+
+    const response = await request(app)
+      .patch('/api/users/1')
+      .set('Cookie', 'token=session-token')
+      .send({ name: 'Jane', lastname: 'Doe', phone: '+14155552671' })
+
+    expect(response.status).toBe(200)
+    expect(userService.update).toHaveBeenCalledWith('1', {
+      name: 'Jane',
+      lastname: 'Doe',
+      phone: '+14155552671'
+    })
+  })
+
+  it('prevents a user from changing their own role', async () => {
+    authService.me.mockResolvedValue({ token: 'refreshed-token', user: mockUser })
+
+    const response = await request(app)
+      .patch('/api/users/1')
+      .set('Cookie', 'token=session-token')
+      .send({ role: ROLES.ADMIN })
+
+    expect(response.status).toBe(403)
+    expect(userService.update).not.toHaveBeenCalled()
+  })
+
+  it('prevents a user from editing another user profile', async () => {
+    authService.me.mockResolvedValue({ token: 'refreshed-token', user: mockUser })
+
+    const response = await request(app)
+      .patch('/api/users/other-user')
+      .set('Cookie', 'token=session-token')
+      .send({ name: 'Jane' })
+
+    expect(response.status).toBe(403)
+    expect(userService.update).not.toHaveBeenCalled()
+  })
+
+  it('redirects an authenticated user to their stored avatar file', async () => {
+    const avatarUrl = 'http://127.0.0.1:8090/api/files/users/1/avatar.jpg'
+    authService.me.mockResolvedValue({ token: 'refreshed-token', user: mockUser })
+    userService.getById.mockResolvedValue({ ...mockUser, avatar: avatarUrl })
+
+    const response = await request(app)
+      .get('/api/users/1/avatar')
+      .set('Cookie', 'token=session-token')
+
+    expect(response.status).toBe(302)
+    expect(response.headers.location).toBe(avatarUrl)
+  })
+
+  it('does not expose another user avatar to non-admins', async () => {
+    authService.me.mockResolvedValue({ token: 'refreshed-token', user: mockUser })
+
+    const response = await request(app)
+      .get('/api/users/other-user/avatar')
+      .set('Cookie', 'token=session-token')
+
+    expect(response.status).toBe(403)
+    expect(userService.getById).not.toHaveBeenCalled()
   })
 
   it('rejects invalid user input without calling the service', async () => {
@@ -157,6 +222,19 @@ describe('UserController', () => {
 
     expect(response.status).toBe(400)
     expect(userService.updateAvatar).not.toHaveBeenCalled()
+  })
+
+  it('allows a user to update their own avatar', async () => {
+    authService.me.mockResolvedValue({ token: 'refreshed-token', user: mockUser })
+    userService.updateAvatar.mockResolvedValue(mockUser)
+
+    const response = await request(app)
+      .patch('/api/users/1/avatar')
+      .set('Cookie', 'token=session-token')
+      .attach('avatar', Buffer.from('avatar'), 'avatar.png')
+
+    expect(response.status).toBe(200)
+    expect(userService.updateAvatar).toHaveBeenCalledWith('1', expect.any(Blob), 'avatar.png')
   })
 
   it('soft-deletes a user through the service', async () => {

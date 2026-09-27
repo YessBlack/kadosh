@@ -5,9 +5,7 @@ const updateUserAvatar = async (id: string, file: Blob) => {
   formData.append('avatar', file)
 
   const response = await api.patch(`users/${id}/avatar`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
+    headers: { 'Content-Type': 'multipart/form-data' }
   })
 
   return response.data

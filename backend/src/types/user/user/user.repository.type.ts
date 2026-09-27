@@ -6,6 +6,6 @@ export interface IUserRepository {
   findByEmail: (email: string) => Promise<User | null>
   create: (input: CreateUserInput) => Promise<User>
   update: (id: string, input: UpdateUserInput) => Promise<User>
-  updateAvatar: (id: string, file: Blob) => Promise<User>
-  softDelete: (id: string) => Promise<void>
+  updateAvatar: (id: string, file: Blob, fileName: string) => Promise<User>
+  delete: (id: string) => Promise<void>
 }

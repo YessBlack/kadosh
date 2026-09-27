@@ -1,3 +1,5 @@
+import type { Role } from '@/features/roles/roles'
+
 export type User = {
   id: string
   email: string
@@ -5,6 +7,7 @@ export type User = {
   lastname: string
   avatar?: string
   isActive: boolean
+  role: Role
   createdBy: string
   lastLogin: string
   phone?: string

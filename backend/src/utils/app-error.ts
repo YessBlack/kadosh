@@ -7,6 +7,7 @@ export type AppErrorCode =
   | 'USER_ALREADY_EXISTS'
   | 'INVALID_FILE_TYPE'
   | 'FILE_TOO_LARGE'
+  | 'VALIDATION_ERROR'
 
 export class AppError extends Error {
   public readonly cause?: unknown

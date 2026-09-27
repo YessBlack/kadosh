@@ -1,5 +1,5 @@
 import { createUserSchema, updateUserSchema } from '@/schemas/user/user.schema'
-import { Role } from '@/types/user/permissions/role.type'
+import { Role } from '@/types/user/role.type'
 import { z } from 'zod'
 
 export type User = {

@@ -1,4 +1,5 @@
 import { userApi } from '@/features/users/api/user.api'
+import { ROLES, type Role } from '@/features/roles/roles'
 import type { User } from '@/features/users/types/auth.types'
 import { useAuthStore } from '@/store/auth.store'
 import { showToast } from '@/utils/toast.utils'
@@ -18,6 +19,7 @@ export const useUserForm = ({ selectedUser, onSuccess }: UseUserFormProps) => {
     lastname: selectedUser?.lastname ?? '',
     email: selectedUser?.email ?? '',
     isActive: selectedUser?.isActive ?? true,
+    role: selectedUser?.role ?? ROLES.VENDEDOR,
     password: '',
     passwordConfirm: '',
     createdBy: user?.id ?? ''
@@ -40,6 +42,10 @@ export const useUserForm = ({ selectedUser, onSuccess }: UseUserFormProps) => {
     const { name, value } = e.target
     setValues(prev => ({ ...prev, [name]: value }))
   }, [])
+
+  const setRole = (role: Role) => {
+    setValues(prev => ({ ...prev, role }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -84,6 +90,7 @@ export const useUserForm = ({ selectedUser, onSuccess }: UseUserFormProps) => {
     isDeleting,
     isCompleted,
     handleChange,
+    setRole,
     handleSubmit,
     setIsDeleting,
     handleDelete,

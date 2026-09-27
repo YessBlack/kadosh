@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
+import path from 'node:path'
 import { createUserSchema, updateUserSchema } from '@/schemas/user/user.schema'
 import { IUserService } from '@/types/user/user/user.service.type'
 import { sendValidationError } from '@/utils/validation.utils'
@@ -28,6 +29,22 @@ export class UserController {
       const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id
       const user = await this.userService.getById(id)
       res.status(200).json(user)
+    } catch (error: unknown) {
+      next(error)
+    }
+  }
+
+  getAvatar = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id
+      const user = await this.userService.getById(id)
+
+      if (!user.avatar) {
+        res.status(404).json({ message: 'Avatar not found' })
+        return
+      }
+
+      res.redirect(user.avatar)
     } catch (error: unknown) {
       next(error)
     }
@@ -67,7 +84,8 @@ export class UserController {
     try {
       const file = new Blob([new Uint8Array(req.file.buffer)], { type: req.file.mimetype })
       const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id
-      const user = await this.userService.updateAvatar(id, file)
+      const fileName = path.basename(req.file.originalname) || 'avatar'
+      const user = await this.userService.updateAvatar(id, file, fileName)
       res.status(200).json(user)
     } catch (error: unknown) {
       next(error)

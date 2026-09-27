@@ -1,4 +1,5 @@
 import { UserForm } from '@/features/users/components/UserForm'
+import { ROLES } from '@/features/roles/roles'
 import { useUserForm } from '@/features/users/hooks/useUserForm'
 import { render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -14,6 +15,7 @@ const baseValues = {
   password: '',
   passwordConfirm: '',
   isActive: true,
+  role: ROLES.VENDEDOR,
   createdBy: ''
 }
 
@@ -23,6 +25,7 @@ const defaultMock = {
   isDeleting: false,
   isCompleted: false,
   handleChange: vi.fn(),
+  setRole: vi.fn(),
   handleSubmit: vi.fn(),
   setIsDeleting: vi.fn(),
   handleDelete: vi.fn(),
@@ -61,6 +64,7 @@ describe('UserForm', () => {
       name: 'John',
       lastname: 'Doe',
       isActive: true,
+      role: ROLES.VENDEDOR,
       createdBy: 'admin',
       lastLogin: '2024-06-01T12:00:00Z',
       createdAt: '2024-05-01T12:00:00Z',
@@ -108,3 +112,11 @@ describe('UserForm', () => {
     })
   })
 })
+
+    it('allows assigning one role', () => {
+      mockUseUserForm.mockReturnValue(defaultMock)
+
+      render(<UserForm selectedUser={null} onSuccess={vi.fn()} />)
+
+      expect(screen.getByRole('combobox', { name: 'Rol' })).toBeInTheDocument()
+    })

@@ -3,18 +3,6 @@ import { MAX_AVATAR_SIZE_BYTES } from '@/config/upload'
 import multer from 'multer'
 import { Request, Response, NextFunction } from 'express'
 
-const HTTP_STATUS_BY_ERROR_CODE = {
-  INVALID_CREDENTIALS: 401,
-  INVALID_SESSION: 401,
-  INVALID_CURRENT_PASSWORD: 401,
-  ACCOUNT_INACTIVE: 403,
-  USER_NOT_FOUND: 404,
-  USER_ALREADY_EXISTS: 409,
-  INVALID_FILE_TYPE: 400,
-  FILE_TOO_LARGE: 400,
-  VALIDATION_ERROR: 400
-} as const
-
 const MAX_AVATAR_SIZE_MB = MAX_AVATAR_SIZE_BYTES / (1024 * 1024)
 
 export function errorMiddleware (
@@ -46,7 +34,7 @@ export function errorMiddleware (
       cause: error.cause
     }, 'Application request error')
 
-    res.status(HTTP_STATUS_BY_ERROR_CODE[error.code]).json({ message: error.message })
+    res.status(error.statusCode).json({ message: error.message })
     return
   }
 

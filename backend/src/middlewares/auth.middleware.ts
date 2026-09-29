@@ -1,5 +1,5 @@
 import { IAuthService } from '@/types/user/auth/auth.service.type'
-import { AppError } from '@/utils/app-error'
+import { AppError, ERROR_CODES } from '@/utils/app-error'
 import { Request, Response, NextFunction } from 'express'
 
 export function createAuthMiddleware (authService: IAuthService) {
@@ -22,7 +22,7 @@ export function createAuthMiddleware (authService: IAuthService) {
       req.user = user
       next()
     } catch (error: unknown) {
-      if (error instanceof AppError && error.code === 'ACCOUNT_INACTIVE') {
+      if (error instanceof AppError && error.code === ERROR_CODES.UNAUTHORIZED) {
         res.status(403).json({ message: error.message })
         return
       }

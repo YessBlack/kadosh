@@ -2,7 +2,7 @@ import PocketBase, { RecordModel } from 'pocketbase'
 import { AuthUserUpdate, IAuthRepository, IAuthSession, AuthResult } from '@/types/user/auth/auth.repository.type'
 import { User } from '@/types/user/user/user.type'
 import { isPocketBaseError } from '@/utils/pocketbase.error'
-import { AppError } from '@/utils/app-error'
+import { AppError, ERROR_CODES } from '@/utils/app-error'
 import { mapPocketBaseUser } from '@/repositories/user/user.mapper'
 import { PocketBaseClientFactory } from '@/types/dependencies/pocketbase.type'
 
@@ -31,7 +31,7 @@ class PocketBaseAuthSession implements IAuthSession {
       return { token: result.token, user: this.toUser(result.record) }
     } catch (error: unknown) {
       if (isPocketBaseError(error) && error.status === 400) {
-        throw new AppError('INVALID_CREDENTIALS', 'Invalid credentials', error)
+        throw new AppError(ERROR_CODES.UNAUTHORIZED, 'Invalid credentials', { cause: error })
       }
       throw error
     }
@@ -44,7 +44,7 @@ class PocketBaseAuthSession implements IAuthSession {
       return { token: result.token, user: this.toUser(result.record) }
     } catch (error: unknown) {
       if (isPocketBaseError(error) && error.status === 401) {
-        throw new AppError('INVALID_SESSION', 'Invalid session', error)
+        throw new AppError(ERROR_CODES.UNAUTHORIZED, 'Invalid session', { cause: error })
       }
       throw error
     }
@@ -56,7 +56,7 @@ class PocketBaseAuthSession implements IAuthSession {
       return this.toUser(record)
     } catch (error: unknown) {
       if (isPocketBaseError(error) && error.status === 404) {
-        throw new AppError('USER_NOT_FOUND', 'User not found', error)
+        throw new AppError(ERROR_CODES.NOT_FOUND, 'User not found', { cause: error })
       }
       throw error
     }

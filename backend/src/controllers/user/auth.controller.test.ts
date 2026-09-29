@@ -3,7 +3,7 @@ import { createApp } from '@/app'
 import { AuthController } from '@/controllers/user/auth.controller'
 import { createAuthRouter } from '@/routes/user/auth.routes'
 import { ROLES } from '@/types/user/role.type'
-import { AppError } from '@/utils/app-error'
+import { AppError, ERROR_CODES } from '@/utils/app-error'
 
 const authService = {
   login: jest.fn(),
@@ -25,7 +25,10 @@ const app = createApp({
 })
 
 describe('AuthController', () => {
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => {
+    jest.clearAllMocks()
+    jest.spyOn(console, 'warn').mockImplementation(() => {})
+  })
 
   it('allows the loopback alias for the local frontend origin', async () => {
     const response = await request(app)
@@ -60,7 +63,7 @@ describe('AuthController', () => {
   })
 
   it('maps invalid credentials to 401', async () => {
-    authService.login.mockRejectedValue(new AppError('INVALID_CREDENTIALS', 'Invalid credentials'))
+    authService.login.mockRejectedValue(new AppError(ERROR_CODES.UNAUTHORIZED, 'Invalid credentials'))
 
     const response = await request(app)
       .post('/api/auth/login')
@@ -70,7 +73,7 @@ describe('AuthController', () => {
   })
 
   it('denies login for inactive accounts', async () => {
-    authService.login.mockRejectedValue(new AppError('ACCOUNT_INACTIVE', 'Account is inactive'))
+    authService.login.mockRejectedValue(new AppError(ERROR_CODES.FORBIDDEN, 'Account is inactive'))
 
     const response = await request(app)
       .post('/api/auth/login')

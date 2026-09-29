@@ -1,7 +1,7 @@
 import { IUserRepository } from '@/types/user/user/user.repository.type'
 import { IUserService } from '@/types/user/user/user.service.type'
 import { User, CreateUserInput, UpdateUserInput } from '@/types/user/user/user.type'
-import { AppError } from '@/utils/app-error'
+import { AppError, ERROR_CODES } from '@/utils/app-error'
 import { MAX_AVATAR_SIZE_BYTES } from '@/config/upload'
 
 const ALLOWED_AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp']
@@ -22,7 +22,7 @@ export class UserService implements IUserService {
     const user = await this.repo.findById(id)
 
     if (!user || user.isDeleted) {
-      throw new AppError('USER_NOT_FOUND', 'User not found')
+      throw new AppError(ERROR_CODES.NOT_FOUND, 'User not found')
     }
 
     return user
@@ -32,7 +32,7 @@ export class UserService implements IUserService {
     const existing = await this.repo.findByEmail(input.email)
 
     if (existing) {
-      throw new AppError('USER_ALREADY_EXISTS', 'User already exists')
+      throw new AppError(ERROR_CODES.CONFLICT, 'User already exists')
     }
 
     return this.repo.create(input)
@@ -44,10 +44,10 @@ export class UserService implements IUserService {
 
   async updateAvatar (id: string, file: Blob, fileName: string): Promise<User> {
     if (!ALLOWED_AVATAR_TYPES.includes(file.type)) {
-      throw new AppError('INVALID_FILE_TYPE', 'Invalid file type')
+      throw new AppError(ERROR_CODES.VALIDATION_ERROR, 'Invalid file type')
     }
     if (file.size > MAX_AVATAR_SIZE_BYTES) {
-      throw new AppError('FILE_TOO_LARGE', `La imagen supera el límite de ${MAX_AVATAR_SIZE_MB} MB`)
+      throw new AppError(ERROR_CODES.FILE_TOO_LARGE, `La imagen supera el límite de ${MAX_AVATAR_SIZE_MB} MB`)
     }
 
     return this.repo.updateAvatar(id, file, fileName)

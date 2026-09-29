@@ -26,6 +26,7 @@ describe('AuthService', () => {
     }
     const repository = { createSession: jest.fn().mockReturnValue(session) } as unknown as IAuthRepository
     const service = new AuthService(repository)
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
 
     await expect(service.login({ email: user.email, password: 'password123' }))

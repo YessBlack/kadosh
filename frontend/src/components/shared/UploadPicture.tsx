@@ -46,7 +46,7 @@ export const UploadPicture = ({
           name={name}
           lastname={lastname}
           isLoading={isLoading}
-          className='w-full h-full'
+          className='w-full h-full bg-violet-200 dark:bg-violet-200'
           classNameText={'text-5xl'}
         />
 

@@ -4,7 +4,7 @@ import { UserController } from '@/controllers/user/user.controller'
 import { createAuthMiddleware } from '@/middlewares/auth.middleware'
 import { createUserRouter } from '@/routes/user/user.routes'
 import { ROLES } from '@/types/user/role.type'
-import { AppError } from '@/utils/app-error'
+import { AppError, ERROR_CODES } from '@/utils/app-error'
 
 const userService = {
   getAll: jest.fn(),
@@ -47,6 +47,7 @@ describe('UserController', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     authService.me.mockResolvedValue({ token: 'refreshed-token', user: adminUser })
+    jest.spyOn(console, 'warn').mockImplementation(() => {})
   })
 
   it('rejects requests without an authenticated session', async () => {
@@ -109,7 +110,7 @@ describe('UserController', () => {
   })
 
   it('maps a missing user to 404', async () => {
-    userService.getById.mockRejectedValue(new AppError('USER_NOT_FOUND', 'User not found'))
+    userService.getById.mockRejectedValue(new AppError(ERROR_CODES.NOT_FOUND, 'User not found'))
 
     const response = await request(app)
       .get('/api/users/unknown')

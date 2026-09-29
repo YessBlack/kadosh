@@ -2,7 +2,7 @@ import type { User } from '@/features/users/types/auth.types'
 import api from '@/lib/axios'
 
 const getAllUsers = async () => {
-   const response = await api.get('users')
+  const response = await api.get('users')
   return response.data
 }
 

@@ -1,4 +1,5 @@
 import { DashboardPage } from '@/features/dashboard/page/DashboardPage'
+import { MyBusinessPage } from '@/features/myBusiness/pages/MyBusinessPage'
 import { ProfilePage } from '@/features/myProfile/pages/ProfilePage'
 import { ROLES } from '@/features/roles/roles'
 import { UsersPage } from '@/features/users/pages/UsersPage'
@@ -19,7 +20,7 @@ export const privateRoutes: RouteObject[] = [
           { path: '/gastos', element: <RoleGuard allowedRoles={[ROLES.ADMIN, ROLES.VENDEDOR]}><div>Gastos</div></RoleGuard> },
           { path: '/inventario', element: <RoleGuard allowedRoles={[ROLES.ADMIN, ROLES.INVENTARIO]}><div>Inventario</div></RoleGuard> },
           { path: '/usuarios', element: <RoleGuard allowedRoles={[ROLES.ADMIN]}><UsersPage /></RoleGuard> },
-          { path: '/negocio', element: <RoleGuard allowedRoles={[ROLES.ADMIN]}><div>Mi Negocio</div></RoleGuard> },
+          { path: '/negocio', element: <RoleGuard allowedRoles={[ROLES.ADMIN]}><MyBusinessPage /></RoleGuard> },
           { path: '/perfil', element: <ProfilePage /> }
         ]
       }

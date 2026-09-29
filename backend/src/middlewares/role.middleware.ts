@@ -30,6 +30,7 @@ export function requireSelfOrRole (role: Role, editableFields?: readonly string[
     }
 
     const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id
+
     if (req.user.id !== id) {
       res.status(403).json({ message: 'Forbidden' })
       return

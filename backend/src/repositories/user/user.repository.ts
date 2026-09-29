@@ -2,7 +2,7 @@ import PocketBase, { RecordModel } from 'pocketbase'
 import { IUserRepository } from '@/types/user/user/user.repository.type'
 import { extractPocketBaseValidationMessage, isPocketBaseEmailNotUniqueError, isPocketBaseError } from '@/utils/pocketbase.error'
 import { CreateUserInput, UpdateUserInput, User } from '@/types/user/user/user.type'
-import { AppError } from '@/utils/app-error'
+import { AppError, ERROR_CODES } from '@/utils/app-error'
 import { mapPocketBaseUser } from '@/repositories/user/user.mapper'
 import { PocketBaseClientFactory } from '@/types/dependencies/pocketbase.type'
 
@@ -47,7 +47,7 @@ export class UserRepository implements IUserRepository {
       return this.toUser(record)
     } catch (error: unknown) {
       if (isPocketBaseEmailNotUniqueError(error)) {
-        throw new AppError('USER_ALREADY_EXISTS', 'User already exists', error)
+        throw new AppError(ERROR_CODES.CONFLICT, 'User already exists', { cause: error })
       }
       throw error
     }
@@ -59,12 +59,14 @@ export class UserRepository implements IUserRepository {
       return this.toUser(record)
     } catch (error: unknown) {
       if (isPocketBaseError(error) && error.status === 404) {
-        throw new AppError('USER_NOT_FOUND', 'User not found', error)
+        throw new AppError(ERROR_CODES.NOT_FOUND, 'User not found', { cause: error })
       }
       const validationMessage = extractPocketBaseValidationMessage(error)
+
       if (validationMessage) {
-        throw new AppError('VALIDATION_ERROR', validationMessage, error)
+        throw new AppError(ERROR_CODES.VALIDATION_ERROR, validationMessage, { cause: error })
       }
+
       throw error
     }
   }
@@ -78,11 +80,11 @@ export class UserRepository implements IUserRepository {
       return this.toUser(record)
     } catch (error: unknown) {
       if (isPocketBaseError(error) && error.status === 404) {
-        throw new AppError('USER_NOT_FOUND', 'User not found', error)
+        throw new AppError(ERROR_CODES.NOT_FOUND, 'User not found', { cause: error })
       }
       const validationMessage = extractPocketBaseValidationMessage(error)
       if (validationMessage) {
-        throw new AppError('VALIDATION_ERROR', validationMessage, error)
+        throw new AppError(ERROR_CODES.VALIDATION_ERROR, validationMessage, { cause: error })
       }
       throw error
     }
@@ -93,7 +95,7 @@ export class UserRepository implements IUserRepository {
       await this.pb.collection('users').delete(id)
     } catch (error: unknown) {
       if (isPocketBaseError(error) && error.status === 404) {
-        throw new AppError('USER_NOT_FOUND', 'User not found', error)
+        throw new AppError(ERROR_CODES.NOT_FOUND, 'User not found', { cause: error })
       }
       throw error
     }

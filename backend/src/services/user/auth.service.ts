@@ -2,7 +2,7 @@ import { IAuthRepository } from '@/types/user/auth/auth.repository.type'
 import { IAuthService } from '@/types/user/auth/auth.service.type'
 import { AuthResponse, ChangePasswordInput, LoginInput } from '@/types/user/auth/auth.type'
 import { User } from '@/types/user/user/user.type'
-import { AppError } from '@/utils/app-error'
+import { AppError, ERROR_CODES } from '@/utils/app-error'
 
 export class AuthService implements IAuthService {
   private readonly repo: IAuthRepository
@@ -40,8 +40,8 @@ export class AuthService implements IAuthService {
     try {
       await session.authWithPassword(user.email, currentPassword)
     } catch (error: unknown) {
-      if (error instanceof AppError && error.code === 'INVALID_CREDENTIALS') {
-        throw new AppError('INVALID_CURRENT_PASSWORD', 'Invalid current password', error)
+      if (error instanceof AppError && error.code === ERROR_CODES.UNAUTHORIZED) {
+        throw new AppError(ERROR_CODES.VALIDATION_ERROR, 'Invalid current password', error)
       }
       throw error
     }
@@ -55,7 +55,7 @@ export class AuthService implements IAuthService {
 
   private assertActiveUser (user: User): void {
     if (!user.isActive) {
-      throw new AppError('ACCOUNT_INACTIVE', 'Account is inactive')
+      throw new AppError(ERROR_CODES.FORBIDDEN, 'Account is inactive')
     }
   }
 }

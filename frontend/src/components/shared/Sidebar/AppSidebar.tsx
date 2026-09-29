@@ -4,12 +4,16 @@ import { DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMen
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
 import type { Role } from '@/features/roles/roles'
 import { useAuthStore } from '@/store/auth.store'
+import { useBusinessStore } from '@/store/business.store'
 import { ChevronsUpDown } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 export const AppSidebar = () => {
   const { toggleSidebar } = useSidebar()
   const { logout, user } = useAuthStore()
+  const { pathname } = useLocation()
+  const { business } = useBusinessStore()
+
   const mainItemsForRole = mainItems.filter(item => item.roles.includes(user?.role as Role))
   const settingsItemsForRole = settingsItems.filter(item => item.roles.includes(user?.role as Role))
 
@@ -29,13 +33,17 @@ export const AppSidebar = () => {
                 onClick={toggleSidebar}
                 className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
               >
-                <div className='flex aspect-square size-8 items-center justify-center rounded-lg bg-white'>
-                  <img src='/logo.png' alt='kadosh' className='size-10 object-cover' />
+               <div className='flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg bg-white p-0.5'>
+                  <img
+                    src={business?.logo || '/logo.png'}
+                    alt='kadosh'
+                    className='size-full object-contain rounded-lg'
+                  />
                 </div>
 
                 <div className='grid flex-1 text-left text-sm leading-tight'>
-                  <span className='truncate font-semibold'>KADOSH</span>
-                  <span className='truncate text-xs text-muted-foreground'>Enterprise</span>
+                  <span className='truncate font-semibold'>{business?.name || 'KADOSH'}</span>
+                  <span className='truncate text-xs text-muted-foreground'>{business?.companyType || 'Enterprise'}</span>
                 </div>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -49,7 +57,11 @@ export const AppSidebar = () => {
                 {mainItemsForRole.map((item) => (
                   <SidebarMenuItem key={item.path}>
                     <Link to={item.path}>
-                      <SidebarMenuButton tooltip={item.label}>
+                      <SidebarMenuButton
+                        tooltip={item.label}
+                        isActive={pathname.startsWith(item.path)}
+                        className='hover:bg-violet-100 hover:text-violet-700 dark:hover:bg-violet-900/40 dark:hover:text-violet-300 data-active:bg-violet-100 data-active:text-violet-700 dark:data-active:bg-violet-900/40 dark:data-active:text-violet-300'
+                      >
                         {item.icon && <item.icon className='size-4' />}
                         <span>{item.label}</span>
                       </SidebarMenuButton>
@@ -67,7 +79,11 @@ export const AppSidebar = () => {
                 {settingsItemsForRole.map((item) => (
                   <SidebarMenuItem key={item.path}>
                     <Link to={item.path}>
-                      <SidebarMenuButton tooltip={item.label}>
+                      <SidebarMenuButton
+                        tooltip={item.label}
+                        isActive={pathname.startsWith(item.path)}
+                        className='hover:bg-violet-100 hover:text-violet-700 dark:hover:bg-violet-900/40 dark:hover:text-violet-300 data-active:bg-violet-100 data-active:text-violet-700 dark:data-active:bg-violet-900/40 dark:data-active:text-violet-300'
+                      >
                         {item.icon && <item.icon className='size-4' />}
                         <span>{item.label}</span>
                       </SidebarMenuButton>

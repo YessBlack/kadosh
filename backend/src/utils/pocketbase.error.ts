@@ -1,3 +1,5 @@
+import { AppError, ERROR_CODES } from '@/utils/app-error'
+
 interface PocketBaseError {
   status: number
   message?: string
@@ -43,4 +45,18 @@ export const extractPocketBaseValidationMessage = (error: unknown): string | nul
   if (!firstFieldError || typeof firstFieldError.message !== 'string') return null
 
   return firstFieldError.message
+}
+
+export function translatePocketBaseError (error: unknown, notFoundMessage: string): unknown {
+  if (isPocketBaseError(error) && error.status === 404) {
+    return new AppError(ERROR_CODES.NOT_FOUND, notFoundMessage, { cause: error })
+  }
+
+  const validationMessage = extractPocketBaseValidationMessage(error)
+
+  if (validationMessage) {
+    return new AppError(ERROR_CODES.VALIDATION_ERROR, validationMessage, { cause: error })
+  }
+
+  return error
 }

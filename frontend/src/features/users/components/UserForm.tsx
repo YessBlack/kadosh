@@ -40,7 +40,7 @@ export const UserForm = ({ selectedUser, onSuccess }: UserFormProps) => {
       <div className='mt-5'>
         <AppAlert
           title='¿Estás seguro?'
-          description='Esta acción es irreversible: el usuario se eliminará por completo y no podrá recuperarse. Los reportes, ventas o movimientos ya registrados que lo referencian podrían mostrar datos incompletos o inconsistentes.'
+          description='Esta acción es irreversible: el item se eliminará por completo y no podrá recuperarse. Los reportes, ventas o movimientos ya registrados que lo referencian podrían mostrar datos incompletos o inconsistentes.'
           variant={ALERT_VARIANT.ERROR}
         />
         <div className='mt-4 flex justify-end gap-2'>

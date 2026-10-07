@@ -38,19 +38,13 @@ export const mainItems: SidebarItem[] = [
         roles: [ROLES.ADMIN, ROLES.INVENTARIO]
       },
       {
-        label: 'Productos',
-        path: '/inventario/productos',
-        id: 'inventario-productos',
-        roles: [ROLES.ADMIN, ROLES.INVENTARIO]
-      },
-      {
         label: 'Movimientos',
         path: '/inventario/movimientos',
         id: 'inventario-movimientos',
         roles: [ROLES.ADMIN, ROLES.INVENTARIO]
       },
       {
-        label: 'Catalogo',
+        label: 'Cátalogo',
         path: '/inventario/catalogo',
         id: 'inventario-catalogo',
         roles: [ROLES.ADMIN, ROLES.INVENTARIO]

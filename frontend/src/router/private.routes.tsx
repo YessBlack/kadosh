@@ -1,9 +1,8 @@
 import { DashboardPage } from '@/features/dashboard/page/DashboardPage'
 import { CatalogPage } from '@/features/inventory/pages/catalog/CatalogPage'
-import { EntriesExitsPage } from '@/features/inventory/pages/entries-exits/EntriesExitsPage'
 import { InventoryDashboardPage } from '@/features/inventory/pages/dashboard/InventoryDashboardPage'
 import { InventoryPage } from '@/features/inventory/pages/InventoryPage'
-import { ProductsPage } from '@/features/inventory/pages/products/ProductsPage'
+import { InventoryMovementPage } from '@/features/inventory/pages/movement/InventoryMovementPage'
 import { MyBusinessPage } from '@/features/myBusiness/pages/MyBusinessPage'
 import { ProfilePage } from '@/features/myProfile/pages/ProfilePage'
 import { ROLES } from '@/features/roles/roles'
@@ -29,8 +28,7 @@ export const privateRoutes: RouteObject[] = [
             children: [
               { index: true, element: <Navigate to='dashboard' replace /> },
               { path: 'dashboard', element: <InventoryDashboardPage /> },
-              { path: 'productos', element: <ProductsPage /> },
-              { path: 'movimientos', element: <EntriesExitsPage /> },
+              { path: 'movimientos', element: <InventoryMovementPage /> },
               { path: 'catalogo', element: <CatalogPage /> }
             ]
           },

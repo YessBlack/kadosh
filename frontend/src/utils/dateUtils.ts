@@ -1,4 +1,4 @@
-export const formatDate = (date: string | boolean | undefined) => {
+export const formatDate = (date: string | boolean | number | undefined) => {
   if (!date || typeof date !== 'string') return '-'
   return new Intl.DateTimeFormat('es-CO', {
     day: '2-digit',

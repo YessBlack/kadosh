@@ -18,6 +18,7 @@ export const CatalogForm = ({ selectedItem, onSuccess, onClose }: CatalogFormPro
   const {
     data,
     isProduct,
+    isEditing,
     isCompleted,
     isSubmitting,
     handleChange,
@@ -62,6 +63,7 @@ export const CatalogForm = ({ selectedItem, onSuccess, onClose }: CatalogFormPro
                 id='item-type'
                 aria-label='Tipo'
                 name='type'
+                disabled={isEditing}
                 className='h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus-visible:border-violet-500 focus-visible:ring-3 focus-visible:ring-violet-400/35 dark:border-[#1E1B4B] dark:bg-[#151b2C]/70 dark:text-[#E5E7EB]'
                 value={data.type}
                 onChange={handleChange}
@@ -72,14 +74,14 @@ export const CatalogForm = ({ selectedItem, onSuccess, onClose }: CatalogFormPro
             </Field>
 
             <Field className='flex flex-col gap-1'>
-              <Label required>SKU</Label>
+              <Label>SKU</Label>
               <Input
-                placeholder='PRD-001'
-                required
+                placeholder='Ej. LIB-DAN-BROWN'
                 name='sku'
                 value={data.sku}
                 onChange={handleChange}
               />
+              <span className='text-xs text-muted-foreground'>Opcional. Si lo dejas vacío, se genera automáticamente.</span>
             </Field>
 
             <Field className='flex flex-col gap-1'>

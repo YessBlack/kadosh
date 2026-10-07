@@ -2,7 +2,7 @@ import { ItemType, PriceMode, Unit } from '@/types/inventory/items.type'
 import { z } from 'zod'
 
 const commonFields = {
-  sku: z.string().min(1, { message: 'SKU is required' }),
+  sku: z.string().trim().optional().default(''),
   name: z.string().min(1, { message: 'Name is required' }),
   description: z.string().optional(),
   category: z.string().optional(),
@@ -33,6 +33,7 @@ export const itemsSchema = z.discriminatedUnion('type', [productSchema, serviceS
 
 export const updateItemsSchema = z.object({
   ...commonFields,
+  sku: z.string().trim().optional(),
   type: z.nativeEnum(ItemType).optional(),
   barcode: z.string().optional(),
   unit: z.nativeEnum(Unit, { message: 'Unit must be a supported unit' }).optional(),

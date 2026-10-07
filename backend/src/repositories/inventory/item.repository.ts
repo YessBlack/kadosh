@@ -3,6 +3,7 @@ import { PocketBaseClientFactory } from '@/types/dependencies/pocketbase.type'
 import { IInventoryItemRepository } from '@/types/inventory/item.repository.type'
 import { Item, ItemType } from '@/types/inventory/items.type'
 import { translatePocketBaseError } from '@/utils/pocketbase.error'
+import { AppError, ERROR_CODES } from '@/utils/app-error'
 import PocketBase, { RecordModel } from 'pocketbase'
 
 export class InventoryItemRepository implements IInventoryItemRepository {
@@ -24,7 +25,8 @@ export class InventoryItemRepository implements IInventoryItemRepository {
 
   async create (input: ItemsInput): Promise<Item> {
     try {
-      const record = await this.pb.collection('inventory_items').create(input)
+      const sku = await this.resolveSku(input.type, input.sku)
+      const record = await this.pb.collection('inventory_items').create({ ...input, sku })
       return this.toItem(record)
     } catch (error: unknown) {
       throw this.translateError(error)
@@ -33,7 +35,16 @@ export class InventoryItemRepository implements IInventoryItemRepository {
 
   async update (id: string, input: UpdateItemsInput): Promise<Item> {
     try {
-      const record = await this.pb.collection('inventory_items').update(id, input)
+      let payload = input
+      if (input.sku !== undefined) {
+        const collection = this.pb.collection('inventory_items')
+        const current = await collection.getOne(id)
+        const type = (input.type ?? current.type) as ItemType
+        const sku = await this.resolveSku(type, input.sku, id)
+        payload = { ...input, sku }
+      }
+
+      const record = await this.pb.collection('inventory_items').update(id, payload)
       return this.toItem(record)
     } catch (error: unknown) {
       throw this.translateError(error)
@@ -63,6 +74,38 @@ export class InventoryItemRepository implements IInventoryItemRepository {
 
   private translateError (error: unknown): unknown {
     return translatePocketBaseError(error, 'Item not found')
+  }
+
+  private async resolveSku (type: ItemType, requestedSku: string, excludedId?: string): Promise<string> {
+    const records = await this.pb.collection('inventory_items').getFullList({ fields: 'id,type,sku' })
+    const otherRecords = records.filter(record => record.id !== excludedId)
+    const normalizedSku = requestedSku.trim()
+
+    if (normalizedSku) {
+      const isDuplicate = otherRecords.some(record =>
+        String(record.sku ?? '').trim().toLowerCase() === normalizedSku.toLowerCase()
+      )
+      if (isDuplicate) {
+        throw new AppError(ERROR_CODES.VALIDATION_ERROR, 'Ese SKU ya está en uso')
+      }
+      return normalizedSku
+    }
+
+    const prefix = type === ItemType.PRODUCT ? 'PRD' : 'SRV'
+    const skuPattern = new RegExp(`^${prefix}-(\\d+)$`, 'i')
+    const existingSkus = new Set(otherRecords.map(record => String(record.sku ?? '').trim().toLowerCase()))
+    let nextNumber = otherRecords.reduce((highest, record) => {
+      const match = String(record.sku ?? '').trim().match(skuPattern)
+      return match ? Math.max(highest, Number(match[1])) : highest
+    }, 0) + 1
+
+    let candidate = `${prefix}-${String(nextNumber).padStart(3, '0')}`
+    while (existingSkus.has(candidate.toLowerCase())) {
+      nextNumber += 1
+      candidate = `${prefix}-${String(nextNumber).padStart(3, '0')}`
+    }
+
+    return candidate
   }
 
   private toItem (record: RecordModel, image?: string): Item {

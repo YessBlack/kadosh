@@ -18,6 +18,26 @@ interface UseCatalogFormProps {
   onClose: () => void
 }
 
+const SAVE_ERROR_MESSAGE = 'Ocurrió un error al guardar el ítem. Por favor, inténtalo nuevamente.'
+
+const getSaveErrorMessage = (error: unknown) => {
+  if (typeof error !== 'object' || error === null || !('response' in error)) {
+    return SAVE_ERROR_MESSAGE
+  }
+
+  const response = error.response
+  if (typeof response !== 'object' || response === null || !('data' in response)) {
+    return SAVE_ERROR_MESSAGE
+  }
+
+  const responseData = response.data
+  if (typeof responseData === 'object' && responseData !== null && 'message' in responseData && typeof responseData.message === 'string') {
+    return responseData.message
+  }
+
+  return SAVE_ERROR_MESSAGE
+}
+
 export const useCatalogForm = ({ selectedItem, onSuccess, onClose }: UseCatalogFormProps) => {
   const [initialData] = useState(() => (selectedItem ? itemToForm(selectedItem) : INITIAL_DATA))
   const [data, setData] = useState<CatalogFormData>(initialData)
@@ -61,11 +81,10 @@ export const useCatalogForm = ({ selectedItem, onSuccess, onClose }: UseCatalogF
       showToast.success('Ítem guardado exitosamente.')
       onSuccess()
       onClose()
-    } catch {
-      showToast.error('Ocurrió un error al guardar el ítem. Por favor, inténtalo nuevamente.')
+    } catch (error) {
+      showToast.error(getSaveErrorMessage(error))
     } finally {
       setIsSubmitting(false)
-      onClose()
     }
   }
 

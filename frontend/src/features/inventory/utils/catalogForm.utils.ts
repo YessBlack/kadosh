@@ -98,7 +98,6 @@ export const formToPayload = (data: CatalogFormData) => {
 
 export const isFormValid = (data: CatalogFormData): boolean => {
   const isCommonValid =
-    data.sku.trim() !== '' &&
     data.name.trim() !== '' &&
     isNonNegative(data.salesPrice)
 

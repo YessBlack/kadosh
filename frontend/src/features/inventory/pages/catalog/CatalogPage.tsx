@@ -9,6 +9,7 @@ import { ROLES } from '@/features/roles/roles'
 import { useFetch } from '@/hooks/useFetch'
 import { useAuthStore } from '@/store/auth.store'
 import { formatDate } from '@/utils/dateUtils'
+import { formatPrice } from '@/utils/stringUtils'
 import { Edit, Plus } from 'lucide-react'
 import { useCallback, useState } from 'react'
 
@@ -57,10 +58,10 @@ export const CatalogPage = () => {
             render: (_value, item) => item.type === ItemType.PRODUCT ? UNIT_LABELS[item.unit] : '—'
           },
           { key: 'category', label: 'Categoría', render: value => value || '—' },
-          { key: 'salesPrice', label: 'Precio de venta' },
-          { key: 'unitCost', label: 'Costo unitario' },
-          { key: 'initialStock', label: 'Stock inicial' },
-          { key: 'minStock', label: 'Stock mínimo' },
+          { key: 'salesPrice', label: 'Precio de venta', render: value => formatPrice(value) },
+          { key: 'unitCost', label: 'Costo unitario', render: value => formatPrice(value) },
+          { key: 'initialStock', label: 'Stock inicial', render: value => value ?? '—' },
+          { key: 'minStock', label: 'Stock mínimo', render: value => value ?? '—' },
           {
             key: 'isActive',
             label: 'Estado',

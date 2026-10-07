@@ -19,17 +19,6 @@ export enum Unit {
   PACK = 'PACK'
 }
 
-export const UNIT_LABELS: Record<Unit, string> = {
-  [Unit.UNIT]: 'und',
-  [Unit.KILOGRAM]: 'kg',
-  [Unit.GRAM]: 'g',
-  [Unit.LITER]: 'lt',
-  [Unit.MILLILITER]: 'ml',
-  [Unit.METER]: 'm',
-  [Unit.BOX]: 'caja',
-  [Unit.PACK]: 'paquete'
-}
-
 export interface ItemBase {
   id: string;
   type: ItemType;
@@ -40,8 +29,8 @@ export interface ItemBase {
   salesPrice: number;
   isActive: boolean;
   image?: string;
-  readonly createdAt: string
-  readonly updatedAt: string
+  readonly createdAt: string;
+  readonly updatedAt: string;
 }
 
 export interface ProductItem extends ItemBase {

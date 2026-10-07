@@ -1,5 +1,5 @@
-export const formatDate = (date: string | boolean | undefined) => {
-  if (!date || typeof date !== 'string') return '-'
+export const formatDate = (date: string | boolean | number | undefined) => {
+  if (!date || typeof date !== 'string') return '—'
   return new Intl.DateTimeFormat('es-CO', {
     day: '2-digit',
     month: '2-digit',

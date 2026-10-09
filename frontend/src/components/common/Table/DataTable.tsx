@@ -7,6 +7,7 @@ import { useState } from 'react'
 type KeysOfUnion<T> = T extends T ? keyof T : never
 interface Column<T> {
   key: KeysOfUnion<T>
+  columnKey?: string
   label: string
   align?: 'left' | 'right'
   render?: (value: T[keyof T], row: T) => React.ReactNode
@@ -62,7 +63,7 @@ export function DataTable<T extends { id: string }>({
               )}
               {columns.map(col => (
                 <TableHead
-                  key={String(col.key)}
+                  key={col.columnKey ?? String(col.key)}
                   className={`font-semibold text-foreground ${col.align === 'right' ? 'text-right' : ''}`}
                 >
                   {col.label}
@@ -106,7 +107,7 @@ export function DataTable<T extends { id: string }>({
                     )}
                     {columns.map(col => (
                       <TableCell
-                        key={String(col.key)}
+                        key={col.columnKey ?? String(col.key)}
                         className={col.align === 'right' ? 'text-right' : ''}
                       >
                         {col.render ? col.render(row[col.key], row) : String(row[col.key] ?? '')}

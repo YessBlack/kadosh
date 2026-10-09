@@ -1,3 +1,6 @@
+import { ItemSummaryDto } from '@/types/inventory/items.type'
+import { UserSummaryDto } from '@/types/user/user/user.type'
+
 export enum MovementType {
   IN = 'IN',
   OUT = 'OUT'
@@ -24,13 +27,13 @@ export const SOURCE_ALLOWED_TYPES: Record<MovementSource, MovementType[]> = {
 export interface Movement {
   id: string;
   item_id: string;
+  item: ItemSummaryDto;
+  createdBy: UserSummaryDto | null;
   type: MovementType;
   quantity: number;
   date: Date;
-  source?: MovementSource;
-  unitCostSnapshot: number;
+  source: MovementSource;
   note?: string;
-  createdBy: string;
   createdAt: Date;
   updatedAt: Date;
 }

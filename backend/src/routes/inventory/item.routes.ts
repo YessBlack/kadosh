@@ -10,6 +10,7 @@ export const createInventoryRouter = ({ inventoryItemController, authMiddleware 
   const router = Router()
 
   router.get('/', authMiddleware, inventoryItemController.getAll)
+  router.get('/search', authMiddleware, inventoryItemController.search)
   router.get('/:id', authMiddleware, inventoryItemController.getById)
   router.post('/', authMiddleware, inventoryItemController.create)
   router.patch('/:id', authMiddleware, inventoryItemController.update)

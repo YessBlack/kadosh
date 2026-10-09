@@ -1,6 +1,6 @@
 export const cleanBarcode = (value: string) => value.split(':').pop()?.trim() ?? ''
 
-export const formatPrice = (value: string | number | boolean | undefined) => {
+export const formatPrice = (value: string | number | boolean | undefined | Date) => {
   if (value === undefined || value === null || value === false) return '—'
 
   const numberValue = typeof value === 'string' ? Number(value) : typeof value === 'number' ? value : NaN

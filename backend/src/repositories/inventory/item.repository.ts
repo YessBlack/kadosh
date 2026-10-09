@@ -23,6 +23,20 @@ export class InventoryItemRepository implements IInventoryItemRepository {
     return result ? this.toItem(result) : null
   }
 
+  async searchProducts (query: string, limit = 10): Promise<Item[]> {
+    const filter = this.pb.filter(
+      'type = {:type} && isActive = true && (name ~ {:q} || sku ~ {:q} || barcode ~ {:q})',
+      { type: ItemType.PRODUCT, q: query }
+    )
+
+    const result = await this.pb.collection('inventory_items').getList(1, limit, {
+      filter,
+      sort: 'name'
+    })
+
+    return result.items.map(record => this.toItem(record))
+  }
+
   async create (input: ItemsInput): Promise<Item> {
     try {
       const sku = await this.resolveSku(input.type, input.sku)
@@ -85,9 +99,11 @@ export class InventoryItemRepository implements IInventoryItemRepository {
       const isDuplicate = otherRecords.some(record =>
         String(record.sku ?? '').trim().toLowerCase() === normalizedSku.toLowerCase()
       )
+
       if (isDuplicate) {
         throw new AppError(ERROR_CODES.VALIDATION_ERROR, 'Ese SKU ya está en uso')
       }
+
       return normalizedSku
     }
 

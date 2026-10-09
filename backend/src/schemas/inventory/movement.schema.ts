@@ -1,13 +1,12 @@
-import { MovementSource, MovementType, SOURCE_ALLOWED_TYPES } from '@/types/inventory/movements.type'
+import { MovementSource, MovementType, SOURCE_ALLOWED_TYPES } from '@/types/inventory/movement.type'
 import { z } from 'zod'
 
 const baseMovementSchema = z.object({
   item_id: z.string().min(1, { message: 'Item ID is required' }),
   type: z.nativeEnum(MovementType, { message: 'Type must be either IN or OUT' }),
   quantity: z.number().min(1, { message: 'Quantity must be a positive number' }),
-  date: z.date({ message: 'Date is required' }),
+  date: z.iso.datetime({ error: 'Date is required' }),
   source: z.nativeEnum(MovementSource).optional(),
-  unitCostSnapshot: z.number().min(0, { message: 'Unit cost snapshot must be a positive number' }),
   note: z.string().optional(),
   createdBy: z.string().min(1, { message: 'Created by is required' })
 })
@@ -31,3 +30,6 @@ const validateSourceType = (
 
 export const movementSchema = baseMovementSchema.superRefine(validateSourceType)
 export const updateMovementSchema = baseMovementSchema.partial().superRefine(validateSourceType)
+
+export type movementInput = z.infer<typeof movementSchema>
+export type UpdateMovementInput = z.infer<typeof updateMovementSchema>

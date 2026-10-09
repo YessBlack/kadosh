@@ -18,6 +18,11 @@ export type User = {
   role: Role
 }
 
+export interface UserSummaryDto {
+  id: string
+  name: string
+}
+
 // request DTO
 export type CreateUserInput = z.infer<typeof createUserSchema>
 export type UpdateUserInput = z.infer<typeof updateUserSchema>

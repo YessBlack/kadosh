@@ -29,6 +29,16 @@ export class InventoryItemController {
     }
   }
 
+  search = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const q = typeof req.query.q === 'string' ? req.query.q : ''
+      const items = await this.service.searchProducts(q)
+      res.status(200).json(items)
+    } catch (error: unknown) {
+      next(error)
+    }
+  }
+
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = itemsSchema.safeParse(req.body)

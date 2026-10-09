@@ -19,6 +19,12 @@ export enum Unit {
   PACK = 'PACK'
 }
 
+export interface ItemSummaryDto {
+  id: string
+  name: string
+  unitCost: number
+}
+
 export interface ItemBase {
   id: string;
   type: ItemType;

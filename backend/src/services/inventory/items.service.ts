@@ -34,6 +34,18 @@ export class InventoryService implements IInventoryService {
     }
   }
 
+  async searchProducts (query: string): Promise<Item[]> {
+    const q = query.trim()
+    if (q.length < 2) return []
+
+    try {
+      return await this.repo.searchProducts(q)
+    } catch (error) {
+      if (error instanceof AppError) throw error
+      throw new AppError(ERROR_CODES.INTERNAL, 'Server error')
+    }
+  }
+
   async createItem (input: ItemsInput): Promise<Item> {
     try {
       const record = await this.repo.create(input)

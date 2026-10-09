@@ -4,8 +4,10 @@ import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, Pagi
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useState } from 'react'
 
+type KeysOfUnion<T> = T extends T ? keyof T : never
 interface Column<T> {
-  key: keyof T
+  key: KeysOfUnion<T>
+  columnKey?: string
   label: string
   align?: 'left' | 'right'
   render?: (value: T[keyof T], row: T) => React.ReactNode
@@ -61,7 +63,7 @@ export function DataTable<T extends { id: string }>({
               )}
               {columns.map(col => (
                 <TableHead
-                  key={String(col.key)}
+                  key={col.columnKey ?? String(col.key)}
                   className={`font-semibold text-foreground ${col.align === 'right' ? 'text-right' : ''}`}
                 >
                   {col.label}
@@ -73,6 +75,17 @@ export function DataTable<T extends { id: string }>({
             {
               isLoading
                 ? <SkeletonRows rows={pageSize} columns={columns.length} hasActions={!!actions} />
+                : data.length === 0
+                  ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length + (actions ? 1 : 0)}
+                        className='h-10 text-center text-muted-foreground'
+                      >
+                        No hay datos para mostrar
+                      </TableCell>
+                    </TableRow>
+                    )
                 : paginatedData.map(row => (
                   <TableRow key={row.id} className='hover:bg-muted/30'>
                     {actions && (
@@ -94,7 +107,7 @@ export function DataTable<T extends { id: string }>({
                     )}
                     {columns.map(col => (
                       <TableCell
-                        key={String(col.key)}
+                        key={col.columnKey ?? String(col.key)}
                         className={col.align === 'right' ? 'text-right' : ''}
                       >
                         {col.render ? col.render(row[col.key], row) : String(row[col.key] ?? '')}

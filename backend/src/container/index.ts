@@ -1,3 +1,5 @@
 export { authController } from './auth.dependencies'
 export { userController } from './user.dependencies'
 export { businessController } from './business.dependencies'
+export { inventoryItemController } from './inventory.items.dependencies'
+export { inventoryMovementController } from './inventory.movements.dependencies'

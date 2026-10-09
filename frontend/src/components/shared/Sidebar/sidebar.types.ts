@@ -5,6 +5,7 @@ export type SidebarItem = {
   id: string
   label: string
   path: string
-  icon: LucideIcon
+  icon?: LucideIcon
   roles: Role[]
+  subItems?: SidebarItem[]
 }
